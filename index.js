@@ -66,6 +66,9 @@ var Air = /** @class */ (function () {
     Air.prototype.moveHorizontal = function (dx) {
         moveToTile(playerx + dx, playery);
     };
+    Air.prototype.moveVertical = function (dy) {
+        moveToTile(playerx, playery + dy);
+    };
     return Air;
 }());
 var Flux = /** @class */ (function () {
@@ -122,6 +125,9 @@ var Flux = /** @class */ (function () {
     Flux.prototype.moveHorizontal = function (dx) {
         moveToTile(playerx + dx, playery);
     };
+    Flux.prototype.moveVertical = function (dy) {
+        moveToTile(playerx, playery + dy);
+    };
     return Flux;
 }());
 var Unbreakable = /** @class */ (function () {
@@ -176,6 +182,7 @@ var Unbreakable = /** @class */ (function () {
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     };
     Unbreakable.prototype.moveHorizontal = function (dx) { };
+    Unbreakable.prototype.moveVertical = function (dy) { };
     return Unbreakable;
 }());
 var Player = /** @class */ (function () {
@@ -226,6 +233,7 @@ var Player = /** @class */ (function () {
     Player.prototype.color = function (g) { };
     Player.prototype.draw = function (g, x, y) { };
     Player.prototype.moveHorizontal = function (dx) { };
+    Player.prototype.moveVertical = function (dy) { };
     return Player;
 }());
 var Stone = /** @class */ (function () {
@@ -285,6 +293,7 @@ var Stone = /** @class */ (function () {
             moveToTile(playerx + dx, playery);
         }
     };
+    Stone.prototype.moveVertical = function (dy) { };
     return Stone;
 }());
 var FallingStone = /** @class */ (function () {
@@ -339,6 +348,7 @@ var FallingStone = /** @class */ (function () {
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     };
     FallingStone.prototype.moveHorizontal = function (dx) { };
+    FallingStone.prototype.moveVertical = function (dy) { };
     return FallingStone;
 }());
 var Box = /** @class */ (function () {
@@ -398,6 +408,7 @@ var Box = /** @class */ (function () {
             moveToTile(playerx + dx, playery);
         }
     };
+    Box.prototype.moveVertical = function (dy) { };
     return Box;
 }());
 var FallingBox = /** @class */ (function () {
@@ -452,6 +463,7 @@ var FallingBox = /** @class */ (function () {
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     };
     FallingBox.prototype.moveHorizontal = function (dx) { };
+    FallingBox.prototype.moveVertical = function (dy) { };
     return FallingBox;
 }());
 var Key1 = /** @class */ (function () {
@@ -509,6 +521,10 @@ var Key1 = /** @class */ (function () {
         removeLock1();
         moveToTile(playerx + dx, playery);
     };
+    Key1.prototype.moveVertical = function (dy) {
+        removeLock1();
+        moveToTile(playerx, playery + dy);
+    };
     return Key1;
 }());
 var Lock1 = /** @class */ (function () {
@@ -563,6 +579,7 @@ var Lock1 = /** @class */ (function () {
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     };
     Lock1.prototype.moveHorizontal = function (dx) { };
+    Lock1.prototype.moveVertical = function (dy) { };
     return Lock1;
 }());
 var Key2 = /** @class */ (function () {
@@ -620,6 +637,10 @@ var Key2 = /** @class */ (function () {
         removeLock1();
         moveToTile(playerx + dx, playery);
     };
+    Key2.prototype.moveVertical = function (dy) {
+        removeLock2();
+        moveToTile(playerx, playery + dy);
+    };
     return Key2;
 }());
 var Lock2 = /** @class */ (function () {
@@ -674,6 +695,7 @@ var Lock2 = /** @class */ (function () {
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     };
     Lock2.prototype.moveHorizontal = function (dx) { };
+    Lock2.prototype.moveVertical = function (dy) { };
     return Lock2;
 }());
 var Right = /** @class */ (function () {
@@ -732,7 +754,7 @@ var Up = /** @class */ (function () {
         return false;
     };
     Up.prototype.handle = function () {
-        moveVertical(-1);
+        map[playery - 1][playerx].moveVertical(-1);
     };
     return Up;
 }());
@@ -752,7 +774,7 @@ var Down = /** @class */ (function () {
         return true;
     };
     Down.prototype.handle = function () {
-        moveVertical(1);
+        map[playery + 1][playerx].moveVertical(1);
     };
     return Down;
 }());
@@ -833,19 +855,6 @@ function moveToTile(newx, newy) {
     map[newy][newx] = new Player();
     playerx = newx;
     playery = newy;
-}
-function moveVertical(dy) {
-    if (map[playery + dy][playerx].isFlux() || map[playery + dy][playerx].isAir()) {
-        moveToTile(playerx, playery + dy);
-    }
-    else if (map[playery + dy][playerx].isKey1()) {
-        removeLock1();
-        moveToTile(playerx, playery + dy);
-    }
-    else if (map[playery + dy][playerx].isKey2()) {
-        removeLock2();
-        moveToTile(playerx, playery + dy);
-    }
 }
 function update() {
     handleInputs();
