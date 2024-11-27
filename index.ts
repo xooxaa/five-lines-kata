@@ -119,16 +119,16 @@ function updateMap() {
 }
 
 function draw() {
-  const g = createGraphics();
-  drawMap(g);
-  drawPlayer(g);
+  const graphics = createGraphics();
+  drawMap(graphics);
+  drawPlayer(graphics);
 }
 
 function createGraphics() {
   let canvas = document.getElementById("GameCanvas") as HTMLCanvasElement;
-  let g = canvas.getContext("2d");
-  g.clearRect(0, 0, canvas.width, canvas.height);
-  return g;
+  let graphics = canvas.getContext("2d");
+  graphics.clearRect(0, 0, canvas.width, canvas.height);
+  return graphics;
 }
 
 function drawMap(g: CanvasRenderingContext2D) {

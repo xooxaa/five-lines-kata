@@ -119,15 +119,15 @@ function updateMap() {
     }
 }
 function draw() {
-    var g = createGraphics();
-    drawMap(g);
-    drawPlayer(g);
+    var graphics = createGraphics();
+    drawMap(graphics);
+    drawPlayer(graphics);
 }
 function createGraphics() {
     var canvas = document.getElementById("GameCanvas");
-    var g = canvas.getContext("2d");
-    g.clearRect(0, 0, canvas.width, canvas.height);
-    return g;
+    var graphics = canvas.getContext("2d");
+    graphics.clearRect(0, 0, canvas.width, canvas.height);
+    return graphics;
 }
 function drawMap(g) {
     for (var y = 0; y < map.length; y++) {
