@@ -160,12 +160,9 @@ function update() {
 }
 function handleInputs() {
     while (inputs.length > 0) {
-        var current = inputs.pop();
-        handleInput(current);
+        var input = inputs.pop();
+        input.handle();
     }
-}
-function handleInput(input) {
-    input.handle();
 }
 function updateMap() {
     for (var y = map.length - 1; y >= 0; y--) {
