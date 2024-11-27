@@ -113,11 +113,15 @@ function update() {
     }
 }
 function draw() {
+    var g = createGraphics();
+    drawMap(g);
+    drawPlayer(g);
+}
+function createGraphics() {
     var canvas = document.getElementById("GameCanvas");
     var g = canvas.getContext("2d");
     g.clearRect(0, 0, canvas.width, canvas.height);
-    drawMap(g);
-    drawPlayer(g);
+    return g;
 }
 function drawMap(g) {
     for (var y = 0; y < map.length; y++) {
