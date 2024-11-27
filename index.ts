@@ -1,4 +1,4 @@
-const TILE_SIZE = 30;
+const TILE_SIZE = 32;
 const FPS = 30;
 const SLEEP = 1000 / FPS;
 
@@ -256,8 +256,12 @@ class Player implements Tile {
     return this.isStone() || this.isBox();
   }
 
-  color(g: CanvasRenderingContext2D): void {}
-  draw(g: CanvasRenderingContext2D, x: number, y: number): void {}
+  color(g: CanvasRenderingContext2D): void {
+    g.fillStyle = "#ff0000";
+  }
+  draw(g: CanvasRenderingContext2D, x: number, y: number): void {
+    g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+  }
 
   moveHorizontal(dx: number): void {}
   moveVertical(dy: number): void {}
@@ -661,7 +665,7 @@ class Key2 implements Tile {
   }
 
   moveHorizontal(dx: number): void {
-    removeLock1();
+    removeLock2();
     moveToTile(playerx + dx, playery);
   }
   moveVertical(dy: number): void {
@@ -934,7 +938,6 @@ function updateTile(x: number, y: number) {
 function draw() {
   const graphics = createGraphics();
   drawMap(graphics);
-  drawPlayer(graphics);
 }
 
 function createGraphics() {
@@ -951,11 +954,6 @@ function drawMap(g: CanvasRenderingContext2D) {
       map[y][x].draw(g, x, y);
     }
   }
-}
-
-function drawPlayer(g: CanvasRenderingContext2D) {
-  g.fillStyle = "#ff0000";
-  g.fillRect(playerx * TILE_SIZE, playery * TILE_SIZE, TILE_SIZE, TILE_SIZE);
 }
 
 function gameLoop() {

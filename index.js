@@ -1,4 +1,4 @@
-var TILE_SIZE = 30;
+var TILE_SIZE = 32;
 var FPS = 30;
 var SLEEP = 1000 / FPS;
 var RawTile;
@@ -230,8 +230,12 @@ var Player = /** @class */ (function () {
     Player.prototype.isPushable = function () {
         return this.isStone() || this.isBox();
     };
-    Player.prototype.color = function (g) { };
-    Player.prototype.draw = function (g, x, y) { };
+    Player.prototype.color = function (g) {
+        g.fillStyle = "#ff0000";
+    };
+    Player.prototype.draw = function (g, x, y) {
+        g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+    };
     Player.prototype.moveHorizontal = function (dx) { };
     Player.prototype.moveVertical = function (dy) { };
     return Player;
@@ -634,7 +638,7 @@ var Key2 = /** @class */ (function () {
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     };
     Key2.prototype.moveHorizontal = function (dx) {
-        removeLock1();
+        removeLock2();
         moveToTile(playerx + dx, playery);
     };
     Key2.prototype.moveVertical = function (dy) {
@@ -892,7 +896,6 @@ function updateTile(x, y) {
 function draw() {
     var graphics = createGraphics();
     drawMap(graphics);
-    drawPlayer(graphics);
 }
 function createGraphics() {
     var canvas = document.getElementById("GameCanvas");
@@ -907,10 +910,6 @@ function drawMap(g) {
             map[y][x].draw(g, x, y);
         }
     }
-}
-function drawPlayer(g) {
-    g.fillStyle = "#ff0000";
-    g.fillRect(playerx * TILE_SIZE, playery * TILE_SIZE, TILE_SIZE, TILE_SIZE);
 }
 function gameLoop() {
     var before = Date.now();
