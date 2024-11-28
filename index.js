@@ -22,6 +22,7 @@ var Falling = /** @class */ (function () {
     Falling.prototype.isFalling = function () {
         return true;
     };
+    Falling.prototype.moveHorizontal = function (tile, dx) { };
     return Falling;
 }());
 var Resting = /** @class */ (function () {
@@ -29,6 +30,12 @@ var Resting = /** @class */ (function () {
     }
     Resting.prototype.isFalling = function () {
         return false;
+    };
+    Resting.prototype.moveHorizontal = function (tile, dx) {
+        if (map[playery][playerx + dx + dx].isAir() && !map[playery + 1][playerx + dx].isAir()) {
+            map[playery][playerx + dx + dx] = tile;
+            moveToTile(playerx + dx, playery);
+        }
     };
     return Resting;
 }());
@@ -309,12 +316,7 @@ var Stone = /** @class */ (function () {
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     };
     Stone.prototype.moveHorizontal = function (dx) {
-        if (this.isFallingStone() === false) {
-            if (map[playery][playerx + dx + dx].isAir() && !map[playery + 1][playerx + dx].isAir()) {
-                map[playery][playerx + dx + dx] = this;
-                moveToTile(playerx + dx, playery);
-            }
-        }
+        this.falling.moveHorizontal(this, dx);
     };
     Stone.prototype.moveVertical = function (dy) { };
     return Stone;
@@ -372,12 +374,7 @@ var Box = /** @class */ (function () {
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     };
     Box.prototype.moveHorizontal = function (dx) {
-        if (this.isFallingBox() === false) {
-            if (map[playery][playerx + dx + dx].isAir() && !map[playery + 1][playerx + dx].isAir()) {
-                map[playery][playerx + dx + dx] = this;
-                moveToTile(playerx + dx, playery);
-            }
-        }
+        this.falling.moveHorizontal(this, dx);
     };
     Box.prototype.moveVertical = function (dy) { };
     return Box;
