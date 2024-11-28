@@ -39,19 +39,19 @@ var Resting = /** @class */ (function () {
     };
     return Resting;
 }());
-var FallStrategy = /** @class */ (function () {
-    function FallStrategy() {
+var FallingStrategy = /** @class */ (function () {
+    function FallingStrategy() {
     }
-    FallStrategy.prototype.update = function (tile, x, y) {
+    FallingStrategy.prototype.update = function (tile, x, y) {
         this.drop(tile, x, y);
     };
-    FallStrategy.prototype.drop = function (tile, x, y) {
+    FallingStrategy.prototype.drop = function (tile, x, y) {
         if (map[y + 1][x].isAir()) {
             map[y + 1][x] = tile;
             map[y][x] = new Air();
         }
     };
-    return FallStrategy;
+    return FallingStrategy;
 }());
 var Air = /** @class */ (function () {
     function Air() {
@@ -176,7 +176,7 @@ var Player = /** @class */ (function () {
 var Stone = /** @class */ (function () {
     function Stone(falling) {
         this.falling = falling;
-        this.fallStrategy = new FallStrategy();
+        this.fallingStrategy = new FallingStrategy();
     }
     Stone.prototype.isAir = function () {
         return false;
@@ -204,14 +204,14 @@ var Stone = /** @class */ (function () {
     };
     Stone.prototype.moveVertical = function (dy) { };
     Stone.prototype.update = function (x, y) {
-        this.fallStrategy.update(this, x, y);
+        this.fallingStrategy.update(this, x, y);
     };
     return Stone;
 }());
 var Box = /** @class */ (function () {
     function Box(falling) {
         this.falling = falling;
-        this.fallStrategy = new FallStrategy();
+        this.fallingStrategy = new FallingStrategy();
     }
     Box.prototype.isAir = function () {
         return false;
@@ -239,7 +239,7 @@ var Box = /** @class */ (function () {
     };
     Box.prototype.moveVertical = function (dy) { };
     Box.prototype.update = function (x, y) {
-        this.fallStrategy.update(this, x, y);
+        this.fallingStrategy.update(this, x, y);
     };
     return Box;
 }());
@@ -417,10 +417,10 @@ var inputs = [];
 var map = [];
 var rawMap = [
     [2, 2, 2, 2, 2, 2, 2, 2],
-    [2, 3, 0, 1, 1, 1, 1, 2],
+    [2, 3, 0, 1, 1, 11, 1, 2],
     [2, 4, 2, 6, 1, 2, 1, 2],
     [2, 8, 4, 1, 1, 2, 1, 2],
-    [2, 4, 1, 1, 1, 9, 1, 2],
+    [2, 4, 10, 1, 1, 9, 1, 2],
     [2, 2, 2, 2, 2, 2, 2, 2],
 ];
 function assertExhausted(x) {

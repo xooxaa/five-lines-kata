@@ -40,7 +40,7 @@ class Resting implements FallingState {
   }
 }
 
-class FallStrategy {
+class FallingStrategy {
   constructor() {}
 
   update(tile: Tile, x: number, y: number): void {
@@ -191,9 +191,9 @@ class Player implements Tile {
   update(x: number, y: number): void {}
 }
 class Stone implements Tile {
-  private fallStrategy: FallStrategy;
+  private fallingStrategy: FallingStrategy;
   constructor(private falling: FallingState) {
-    this.fallStrategy = new FallStrategy();
+    this.fallingStrategy = new FallingStrategy();
   }
 
   isAir() {
@@ -225,14 +225,14 @@ class Stone implements Tile {
   moveVertical(dy: number): void {}
 
   update(x: number, y: number): void {
-    this.fallStrategy.update(this, x, y);
+    this.fallingStrategy.update(this, x, y);
   }
 }
 
 class Box implements Tile {
-  private fallStrategy: FallStrategy;
+  private fallingStrategy: FallingStrategy;
   constructor(private falling: FallingState) {
-    this.fallStrategy = new FallStrategy();
+    this.fallingStrategy = new FallingStrategy();
   }
 
   isAir() {
@@ -264,7 +264,7 @@ class Box implements Tile {
   moveVertical(dy: number): void {}
 
   update(x: number, y: number): void {
-    this.fallStrategy.update(this, x, y);
+    this.fallingStrategy.update(this, x, y);
   }
 }
 
@@ -432,10 +432,10 @@ let inputs: Input[] = [];
 let map: Tile[][] = [];
 let rawMap: RawTile[][] = [
   [2, 2, 2, 2, 2, 2, 2, 2],
-  [2, 3, 0, 1, 1, 1, 1, 2],
+  [2, 3, 0, 1, 1, 11, 1, 2],
   [2, 4, 2, 6, 1, 2, 1, 2],
   [2, 8, 4, 1, 1, 2, 1, 2],
-  [2, 4, 1, 1, 1, 9, 1, 2],
+  [2, 4, 10, 1, 1, 9, 1, 2],
   [2, 2, 2, 2, 2, 2, 2, 2],
 ];
 
