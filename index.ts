@@ -72,7 +72,6 @@ interface Tile {
 
   update(x: number, y: number): void;
 }
-
 class Air implements Tile {
   isAir() {
     return true;
@@ -413,25 +412,21 @@ class Lock2 implements Tile {
 interface Input {
   handle(): void;
 }
-
 class Right implements Input {
   handle() {
     map[playery][playerx + 1].moveHorizontal(1);
   }
 }
-
 class Left implements Input {
   handle() {
     map[playery][playerx - 1].moveHorizontal(-1);
   }
 }
-
 class Up implements Input {
   handle() {
     map[playery - 1][playerx].moveVertical(-1);
   }
 }
-
 class Down implements Input {
   handle() {
     map[playery + 1][playerx].moveVertical(1);
@@ -440,6 +435,8 @@ class Down implements Input {
 
 let playerx = 1;
 let playery = 1;
+let inputs: Input[] = [];
+let map: Tile[][] = [];
 let rawMap: RawTile[][] = [
   [2, 2, 2, 2, 2, 2, 2, 2],
   [2, 3, 0, 1, 1, 2, 0, 2],
@@ -448,9 +445,6 @@ let rawMap: RawTile[][] = [
   [2, 4, 1, 1, 1, 9, 0, 2],
   [2, 2, 2, 2, 2, 2, 2, 2],
 ];
-let map: Tile[][] = [];
-
-let inputs: Input[] = [];
 
 function assertExhausted(x: never): never {
   throw new Error("Unexpected Object" + x);
@@ -491,7 +485,6 @@ function transformMap() {
   map = new Array(rawMap.length);
   for (let y = 0; y < rawMap.length; y++) {
     map[y] = new Array(rawMap[y].length);
-
     for (let x = 0; x < rawMap[y].length; x++) {
       map[y][x] = transformTile(rawMap[y][x]);
     }
@@ -532,7 +525,6 @@ function update() {
 function handleInputs() {
   while (inputs.length > 0) {
     let input = inputs.pop();
-
     input.handle();
   }
 }

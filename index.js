@@ -407,6 +407,8 @@ var Down = /** @class */ (function () {
 }());
 var playerx = 1;
 var playery = 1;
+var inputs = [];
+var map = [];
 var rawMap = [
     [2, 2, 2, 2, 2, 2, 2, 2],
     [2, 3, 0, 1, 1, 2, 0, 2],
@@ -415,8 +417,6 @@ var rawMap = [
     [2, 4, 1, 1, 1, 9, 0, 2],
     [2, 2, 2, 2, 2, 2, 2, 2],
 ];
-var map = [];
-var inputs = [];
 function assertExhausted(x) {
     throw new Error("Unexpected Object" + x);
 }
