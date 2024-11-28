@@ -407,9 +407,7 @@ var Reset = /** @class */ (function () {
     function Reset() {
     }
     Reset.prototype.handle = function () {
-        transformMap();
-        playerx = 1;
-        playery = 1;
+        resetMap();
     };
     return Reset;
 }());
@@ -538,10 +536,13 @@ function gameLoop() {
 }
 function resetOnWin() {
     if (map[4][6].isBox()) {
-        transformMap();
-        playerx = 1;
-        playery = 1;
+        resetMap();
     }
+}
+function resetMap() {
+    transformMap();
+    playerx = 1;
+    playery = 1;
 }
 window.onload = function () {
     transformMap();

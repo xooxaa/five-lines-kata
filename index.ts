@@ -422,9 +422,7 @@ class Down implements Input {
 }
 class Reset implements Input {
   handle() {
-    transformMap();
-    playerx = 1;
-    playery = 1;
+    resetMap();
   }
 }
 
@@ -566,10 +564,14 @@ function gameLoop() {
 
 function resetOnWin() {
   if (map[4][6].isBox()) {
-    transformMap();
-    playerx = 1;
-    playery = 1;
+    resetMap();
   }
+}
+
+function resetMap() {
+  transformMap();
+  playerx = 1;
+  playery = 1;
 }
 
 window.onload = () => {
