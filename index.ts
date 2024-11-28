@@ -60,7 +60,6 @@ interface Tile {
   isBox(): boolean;
   isLock1(): boolean;
   isLock2(): boolean;
-
   isFalling(): boolean;
 
   color(g: CanvasRenderingContext2D): void;
@@ -84,7 +83,6 @@ class Air implements Tile {
   isLock2() {
     return false;
   }
-
   isFalling(): boolean {
     return false;
   }
@@ -114,7 +112,6 @@ class Flux implements Tile {
   isLock2() {
     return false;
   }
-
   isFalling(): boolean {
     return false;
   }
@@ -148,7 +145,6 @@ class Unbreakable implements Tile {
   isLock2() {
     return false;
   }
-
   isFalling(): boolean {
     return false;
   }
@@ -178,7 +174,6 @@ class Player implements Tile {
   isLock2() {
     return false;
   }
-
   isFalling(): boolean {
     return false;
   }
@@ -213,7 +208,6 @@ class Stone implements Tile {
   isLock2() {
     return false;
   }
-
   isFalling(): boolean {
     return this.falling.isFalling();
   }
@@ -253,7 +247,6 @@ class Box implements Tile {
   isLock2() {
     return false;
   }
-
   isFalling(): boolean {
     return this.falling.isFalling();
   }
@@ -288,7 +281,6 @@ class Key1 implements Tile {
   isLock2() {
     return false;
   }
-
   isFalling(): boolean {
     return false;
   }
@@ -324,7 +316,6 @@ class Lock1 implements Tile {
   isLock2() {
     return false;
   }
-
   isFalling(): boolean {
     return false;
   }
@@ -354,7 +345,6 @@ class Key2 implements Tile {
   isLock2() {
     return false;
   }
-
   isFalling(): boolean {
     return false;
   }
@@ -390,7 +380,6 @@ class Lock2 implements Tile {
   isLock2() {
     return true;
   }
-
   isFalling(): boolean {
     return false;
   }
