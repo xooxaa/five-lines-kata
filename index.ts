@@ -64,9 +64,6 @@ interface Tile {
   isFalling(): boolean;
   canFall(): boolean;
 
-  rest(): void;
-  drop(): void;
-
   color(g: CanvasRenderingContext2D): void;
   draw(g: CanvasRenderingContext2D, x: number, y: number): void;
 
@@ -93,9 +90,6 @@ class Air implements Tile {
   canFall() {
     return false;
   }
-
-  rest(): void {}
-  drop(): void {}
 
   color(g: CanvasRenderingContext2D): void {}
   draw(g: CanvasRenderingContext2D, x: number, y: number): void {}
@@ -126,9 +120,6 @@ class Flux implements Tile {
   canFall() {
     return false;
   }
-
-  rest(): void {}
-  drop(): void {}
 
   color(g: CanvasRenderingContext2D): void {
     g.fillStyle = "#ccffcc";
@@ -164,9 +155,6 @@ class Unbreakable implements Tile {
     return false;
   }
 
-  rest(): void {}
-  drop(): void {}
-
   color(g: CanvasRenderingContext2D): void {
     g.fillStyle = "#999999";
   }
@@ -196,9 +184,6 @@ class Player implements Tile {
   canFall() {
     return false;
   }
-
-  rest(): void {}
-  drop(): void {}
 
   color(g: CanvasRenderingContext2D): void {
     g.fillStyle = "#ff0000";
@@ -233,13 +218,6 @@ class Stone implements Tile {
   }
   canFall() {
     return true;
-  }
-
-  rest(): void {
-    this.falling = new Resting();
-  }
-  drop(): void {
-    this.falling = new Falling();
   }
 
   color(g: CanvasRenderingContext2D): void {
@@ -282,13 +260,6 @@ class Box implements Tile {
     return true;
   }
 
-  rest(): void {
-    this.falling = new Resting();
-  }
-  drop(): void {
-    this.falling = new Falling();
-  }
-
   color(g: CanvasRenderingContext2D): void {
     g.fillStyle = "#8b4513";
   }
@@ -323,9 +294,6 @@ class Key1 implements Tile {
   canFall() {
     return false;
   }
-
-  rest(): void {}
-  drop(): void {}
 
   color(g: CanvasRenderingContext2D): void {
     g.fillStyle = "#ffcc00";
@@ -363,9 +331,6 @@ class Lock1 implements Tile {
     return false;
   }
 
-  rest(): void {}
-  drop(): void {}
-
   color(g: CanvasRenderingContext2D): void {
     g.fillStyle = "#ffcc00";
   }
@@ -395,9 +360,6 @@ class Key2 implements Tile {
   canFall() {
     return false;
   }
-
-  rest(): void {}
-  drop(): void {}
 
   color(g: CanvasRenderingContext2D): void {
     g.fillStyle = "#00ccff";
@@ -434,9 +396,6 @@ class Lock2 implements Tile {
   canFall() {
     return false;
   }
-
-  rest(): void {}
-  drop(): void {}
 
   color(g: CanvasRenderingContext2D): void {
     g.fillStyle = "#00ccff";

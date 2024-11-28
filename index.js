@@ -73,8 +73,6 @@ var Air = /** @class */ (function () {
     Air.prototype.canFall = function () {
         return false;
     };
-    Air.prototype.rest = function () { };
-    Air.prototype.drop = function () { };
     Air.prototype.color = function (g) { };
     Air.prototype.draw = function (g, x, y) { };
     Air.prototype.moveHorizontal = function (dx) {
@@ -104,8 +102,6 @@ var Flux = /** @class */ (function () {
     Flux.prototype.canFall = function () {
         return false;
     };
-    Flux.prototype.rest = function () { };
-    Flux.prototype.drop = function () { };
     Flux.prototype.color = function (g) {
         g.fillStyle = "#ccffcc";
     };
@@ -139,8 +135,6 @@ var Unbreakable = /** @class */ (function () {
     Unbreakable.prototype.canFall = function () {
         return false;
     };
-    Unbreakable.prototype.rest = function () { };
-    Unbreakable.prototype.drop = function () { };
     Unbreakable.prototype.color = function (g) {
         g.fillStyle = "#999999";
     };
@@ -170,8 +164,6 @@ var Player = /** @class */ (function () {
     Player.prototype.canFall = function () {
         return false;
     };
-    Player.prototype.rest = function () { };
-    Player.prototype.drop = function () { };
     Player.prototype.color = function (g) {
         g.fillStyle = "#ff0000";
     };
@@ -202,12 +194,6 @@ var Stone = /** @class */ (function () {
     };
     Stone.prototype.canFall = function () {
         return true;
-    };
-    Stone.prototype.rest = function () {
-        this.falling = new Resting();
-    };
-    Stone.prototype.drop = function () {
-        this.falling = new Falling();
     };
     Stone.prototype.color = function (g) {
         g.fillStyle = "#0000cc";
@@ -244,12 +230,6 @@ var Box = /** @class */ (function () {
     Box.prototype.canFall = function () {
         return true;
     };
-    Box.prototype.rest = function () {
-        this.falling = new Resting();
-    };
-    Box.prototype.drop = function () {
-        this.falling = new Falling();
-    };
     Box.prototype.color = function (g) {
         g.fillStyle = "#8b4513";
     };
@@ -283,8 +263,6 @@ var Key1 = /** @class */ (function () {
     Key1.prototype.canFall = function () {
         return false;
     };
-    Key1.prototype.rest = function () { };
-    Key1.prototype.drop = function () { };
     Key1.prototype.color = function (g) {
         g.fillStyle = "#ffcc00";
     };
@@ -320,8 +298,6 @@ var Lock1 = /** @class */ (function () {
     Lock1.prototype.canFall = function () {
         return false;
     };
-    Lock1.prototype.rest = function () { };
-    Lock1.prototype.drop = function () { };
     Lock1.prototype.color = function (g) {
         g.fillStyle = "#ffcc00";
     };
@@ -351,8 +327,6 @@ var Key2 = /** @class */ (function () {
     Key2.prototype.canFall = function () {
         return false;
     };
-    Key2.prototype.rest = function () { };
-    Key2.prototype.drop = function () { };
     Key2.prototype.color = function (g) {
         g.fillStyle = "#00ccff";
     };
@@ -388,8 +362,6 @@ var Lock2 = /** @class */ (function () {
     Lock2.prototype.canFall = function () {
         return false;
     };
-    Lock2.prototype.rest = function () { };
-    Lock2.prototype.drop = function () { };
     Lock2.prototype.color = function (g) {
         g.fillStyle = "#00ccff";
     };
