@@ -898,12 +898,9 @@ function handleInputs() {
 function updateMap() {
     for (var y = map.length - 1; y >= 0; y--) {
         for (var x = 0; x < map[y].length; x++) {
-            updateTile(x, y);
+            map[y][x].update(x, y);
         }
     }
-}
-function updateTile(x, y) {
-    map[y][x].update(x, y);
 }
 function draw() {
     var graphics = createGraphics();
