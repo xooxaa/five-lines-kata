@@ -1,21 +1,3 @@
-var TILE_SIZE = 40;
-var FPS = 30;
-var SLEEP = 1000 / FPS;
-var RawTile;
-(function (RawTile) {
-    RawTile[RawTile["AIR"] = 0] = "AIR";
-    RawTile[RawTile["FLUX"] = 1] = "FLUX";
-    RawTile[RawTile["UNBREAKABLE"] = 2] = "UNBREAKABLE";
-    RawTile[RawTile["PLAYER"] = 3] = "PLAYER";
-    RawTile[RawTile["STONE"] = 4] = "STONE";
-    RawTile[RawTile["FALLING_STONE"] = 5] = "FALLING_STONE";
-    RawTile[RawTile["BOX"] = 6] = "BOX";
-    RawTile[RawTile["FALLING_BOX"] = 7] = "FALLING_BOX";
-    RawTile[RawTile["KEY1"] = 8] = "KEY1";
-    RawTile[RawTile["LOCK1"] = 9] = "LOCK1";
-    RawTile[RawTile["KEY2"] = 10] = "KEY2";
-    RawTile[RawTile["LOCK2"] = 11] = "LOCK2";
-})(RawTile || (RawTile = {}));
 var Falling = /** @class */ (function () {
     function Falling() {
     }
@@ -53,6 +35,39 @@ var FallingStrategy = /** @class */ (function () {
     };
     return FallingStrategy;
 }());
+var KeyConfiguration = /** @class */ (function () {
+    function KeyConfiguration(color, _1, removeStrategy) {
+        this.color = color;
+        this._1 = _1;
+        this.removeStrategy = removeStrategy;
+    }
+    KeyConfiguration.prototype.setColor = function (g) {
+        g.fillStyle = this.color;
+    };
+    KeyConfiguration.prototype.is1 = function () {
+        return this._1;
+    };
+    KeyConfiguration.prototype.removeLock = function () {
+        remove(this.removeStrategy);
+    };
+    return KeyConfiguration;
+}());
+var RemoveLock1 = /** @class */ (function () {
+    function RemoveLock1() {
+    }
+    RemoveLock1.prototype.check = function (tile) {
+        return tile.isLock1();
+    };
+    return RemoveLock1;
+}());
+var RemoveLock2 = /** @class */ (function () {
+    function RemoveLock2() {
+    }
+    RemoveLock2.prototype.check = function (tile) {
+        return tile.isLock2();
+    };
+    return RemoveLock2;
+}());
 var Air = /** @class */ (function () {
     function Air() {
     }
@@ -71,7 +86,6 @@ var Air = /** @class */ (function () {
     Air.prototype.isFalling = function () {
         return false;
     };
-    Air.prototype.color = function (g) { };
     Air.prototype.draw = function (g, x, y) { };
     Air.prototype.moveHorizontal = function (dx) {
         moveToTile(playerx + dx, playery);
@@ -100,10 +114,8 @@ var Flux = /** @class */ (function () {
     Flux.prototype.isFalling = function () {
         return false;
     };
-    Flux.prototype.color = function (g) {
-        g.fillStyle = "#ccffcc";
-    };
     Flux.prototype.draw = function (g, x, y) {
+        g.fillStyle = "#ccffcc";
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     };
     Flux.prototype.moveHorizontal = function (dx) {
@@ -133,10 +145,8 @@ var Unbreakable = /** @class */ (function () {
     Unbreakable.prototype.isFalling = function () {
         return false;
     };
-    Unbreakable.prototype.color = function (g) {
-        g.fillStyle = "#999999";
-    };
     Unbreakable.prototype.draw = function (g, x, y) {
+        g.fillStyle = "#999999";
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     };
     Unbreakable.prototype.moveHorizontal = function (dx) { };
@@ -162,10 +172,8 @@ var Player = /** @class */ (function () {
     Player.prototype.isFalling = function () {
         return false;
     };
-    Player.prototype.color = function (g) {
-        g.fillStyle = "#ff0000";
-    };
     Player.prototype.draw = function (g, x, y) {
+        g.fillStyle = "#ff0000";
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     };
     Player.prototype.moveHorizontal = function (dx) { };
@@ -193,10 +201,8 @@ var Stone = /** @class */ (function () {
     Stone.prototype.isFalling = function () {
         return this.falling.isFalling();
     };
-    Stone.prototype.color = function (g) {
-        g.fillStyle = "#0000cc";
-    };
     Stone.prototype.draw = function (g, x, y) {
+        g.fillStyle = "#0000cc";
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     };
     Stone.prototype.moveHorizontal = function (dx) {
@@ -228,10 +234,8 @@ var Box = /** @class */ (function () {
     Box.prototype.isFalling = function () {
         return this.falling.isFalling();
     };
-    Box.prototype.color = function (g) {
-        g.fillStyle = "#8b4513";
-    };
     Box.prototype.draw = function (g, x, y) {
+        g.fillStyle = "#8b4513";
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     };
     Box.prototype.moveHorizontal = function (dx) {
@@ -243,133 +247,67 @@ var Box = /** @class */ (function () {
     };
     return Box;
 }());
-var Key1 = /** @class */ (function () {
-    function Key1() {
+var Key = /** @class */ (function () {
+    function Key(keyConf) {
+        this.keyConf = keyConf;
     }
-    Key1.prototype.isAir = function () {
+    Key.prototype.isAir = function () {
         return false;
     };
-    Key1.prototype.isBox = function () {
+    Key.prototype.isBox = function () {
         return false;
     };
-    Key1.prototype.isLock1 = function () {
+    Key.prototype.isLock1 = function () {
         return false;
     };
-    Key1.prototype.isLock2 = function () {
+    Key.prototype.isLock2 = function () {
         return false;
     };
-    Key1.prototype.isFalling = function () {
+    Key.prototype.isFalling = function () {
         return false;
     };
-    Key1.prototype.color = function (g) {
-        g.fillStyle = "#ffcc00";
-    };
-    Key1.prototype.draw = function (g, x, y) {
+    Key.prototype.draw = function (g, x, y) {
+        this.keyConf.setColor(g);
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     };
-    Key1.prototype.moveHorizontal = function (dx) {
-        removeLock1();
+    Key.prototype.moveHorizontal = function (dx) {
+        this.keyConf.removeLock();
         moveToTile(playerx + dx, playery);
     };
-    Key1.prototype.moveVertical = function (dy) {
-        removeLock1();
+    Key.prototype.moveVertical = function (dy) {
+        this.keyConf.removeLock();
         moveToTile(playerx, playery + dy);
     };
-    Key1.prototype.update = function (x, y) { };
-    return Key1;
+    Key.prototype.update = function (x, y) { };
+    return Key;
 }());
-var Lock1 = /** @class */ (function () {
-    function Lock1() {
+var Locked = /** @class */ (function () {
+    function Locked(keyConf) {
+        this.keyConf = keyConf;
     }
-    Lock1.prototype.isAir = function () {
+    Locked.prototype.isAir = function () {
         return false;
     };
-    Lock1.prototype.isBox = function () {
+    Locked.prototype.isBox = function () {
         return false;
     };
-    Lock1.prototype.isLock1 = function () {
-        return true;
+    Locked.prototype.isLock1 = function () {
+        return this.keyConf.is1();
     };
-    Lock1.prototype.isLock2 = function () {
+    Locked.prototype.isLock2 = function () {
+        return !this.keyConf.is1();
+    };
+    Locked.prototype.isFalling = function () {
         return false;
     };
-    Lock1.prototype.isFalling = function () {
-        return false;
-    };
-    Lock1.prototype.color = function (g) {
-        g.fillStyle = "#ffcc00";
-    };
-    Lock1.prototype.draw = function (g, x, y) {
+    Locked.prototype.draw = function (g, x, y) {
+        this.keyConf.setColor(g);
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     };
-    Lock1.prototype.moveHorizontal = function (dx) { };
-    Lock1.prototype.moveVertical = function (dy) { };
-    Lock1.prototype.update = function (x, y) { };
-    return Lock1;
-}());
-var Key2 = /** @class */ (function () {
-    function Key2() {
-    }
-    Key2.prototype.isAir = function () {
-        return false;
-    };
-    Key2.prototype.isBox = function () {
-        return false;
-    };
-    Key2.prototype.isLock1 = function () {
-        return false;
-    };
-    Key2.prototype.isLock2 = function () {
-        return false;
-    };
-    Key2.prototype.isFalling = function () {
-        return false;
-    };
-    Key2.prototype.color = function (g) {
-        g.fillStyle = "#00ccff";
-    };
-    Key2.prototype.draw = function (g, x, y) {
-        g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-    };
-    Key2.prototype.moveHorizontal = function (dx) {
-        removeLock2();
-        moveToTile(playerx + dx, playery);
-    };
-    Key2.prototype.moveVertical = function (dy) {
-        removeLock2();
-        moveToTile(playerx, playery + dy);
-    };
-    Key2.prototype.update = function (x, y) { };
-    return Key2;
-}());
-var Lock2 = /** @class */ (function () {
-    function Lock2() {
-    }
-    Lock2.prototype.isAir = function () {
-        return false;
-    };
-    Lock2.prototype.isBox = function () {
-        return false;
-    };
-    Lock2.prototype.isLock1 = function () {
-        return false;
-    };
-    Lock2.prototype.isLock2 = function () {
-        return true;
-    };
-    Lock2.prototype.isFalling = function () {
-        return false;
-    };
-    Lock2.prototype.color = function (g) {
-        g.fillStyle = "#00ccff";
-    };
-    Lock2.prototype.draw = function (g, x, y) {
-        g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-    };
-    Lock2.prototype.moveHorizontal = function (dx) { };
-    Lock2.prototype.moveVertical = function (dy) { };
-    Lock2.prototype.update = function (x, y) { };
-    return Lock2;
+    Locked.prototype.moveHorizontal = function (dx) { };
+    Locked.prototype.moveVertical = function (dy) { };
+    Locked.prototype.update = function (x, y) { };
+    return Locked;
 }());
 var Right = /** @class */ (function () {
     function Right() {
@@ -411,16 +349,36 @@ var Reset = /** @class */ (function () {
     };
     return Reset;
 }());
+var RawTile;
+(function (RawTile) {
+    RawTile[RawTile["AIR"] = 0] = "AIR";
+    RawTile[RawTile["FLUX"] = 1] = "FLUX";
+    RawTile[RawTile["UNBREAKABLE"] = 2] = "UNBREAKABLE";
+    RawTile[RawTile["PLAYER"] = 3] = "PLAYER";
+    RawTile[RawTile["STONE"] = 4] = "STONE";
+    RawTile[RawTile["FALLING_STONE"] = 5] = "FALLING_STONE";
+    RawTile[RawTile["BOX"] = 6] = "BOX";
+    RawTile[RawTile["FALLING_BOX"] = 7] = "FALLING_BOX";
+    RawTile[RawTile["KEY1"] = 8] = "KEY1";
+    RawTile[RawTile["LOCK1"] = 9] = "LOCK1";
+    RawTile[RawTile["KEY2"] = 10] = "KEY2";
+    RawTile[RawTile["LOCK2"] = 11] = "LOCK2";
+})(RawTile || (RawTile = {}));
+var TILE_SIZE = 40;
+var FPS = 30;
+var SLEEP = 1000 / FPS;
+var YELLOW_KEY = new KeyConfiguration("#ffcc00", true, new RemoveLock1());
+var TEAL_KEY = new KeyConfiguration("#00ccff", false, new RemoveLock2());
 var playerx = 1;
 var playery = 1;
-var inputs = [];
 var map = [];
+var inputs = [];
 var rawMap = [
     [2, 2, 2, 2, 2, 2, 2, 2],
-    [2, 3, 0, 1, 1, 11, 1, 2],
-    [2, 4, 2, 6, 1, 2, 1, 2],
-    [2, 8, 4, 1, 1, 2, 1, 2],
-    [2, 4, 10, 1, 1, 9, 1, 2],
+    [2, 3, 0, 1, 1, 1, 0, 2],
+    [2, 4, 2, 6, 2, 2, 0, 2],
+    [2, 8, 4, 1, 1, 11, 0, 2],
+    [2, 4, 1, 1, 1, 9, 10, 2],
     [2, 2, 2, 2, 2, 2, 2, 2],
 ];
 function assertExhausted(x) {
@@ -445,13 +403,13 @@ function transformTile(tile) {
         case RawTile.FALLING_BOX:
             return new Box(new Falling());
         case RawTile.KEY1:
-            return new Key1();
+            return new Key(YELLOW_KEY);
         case RawTile.LOCK1:
-            return new Lock1();
+            return new Locked(YELLOW_KEY);
         case RawTile.KEY2:
-            return new Key2();
+            return new Key(TEAL_KEY);
         case RawTile.LOCK2:
-            return new Lock2();
+            return new Locked(TEAL_KEY);
         default:
             assertExhausted(tile);
     }
@@ -465,19 +423,10 @@ function transformMap() {
         }
     }
 }
-function removeLock1() {
+function remove(removeStrategy) {
     for (var y = 0; y < map.length; y++) {
         for (var x = 0; x < map[y].length; x++) {
-            if (map[y][x].isLock1()) {
-                map[y][x] = new Air();
-            }
-        }
-    }
-}
-function removeLock2() {
-    for (var y = 0; y < map.length; y++) {
-        for (var x = 0; x < map[y].length; x++) {
-            if (map[y][x].isLock2()) {
+            if (removeStrategy.check(map[y][x])) {
                 map[y][x] = new Air();
             }
         }
@@ -519,7 +468,6 @@ function createGraphics() {
 function drawMap(g) {
     for (var y = 0; y < map.length; y++) {
         for (var x = 0; x < map[y].length; x++) {
-            map[y][x].color(g);
             map[y][x].draw(g, x, y);
         }
     }
