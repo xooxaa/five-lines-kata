@@ -64,12 +64,6 @@ var Air = /** @class */ (function () {
     Air.prototype.isAir = function () {
         return true;
     };
-    Air.prototype.isFallingStone = function () {
-        return false;
-    };
-    Air.prototype.isFallingBox = function () {
-        return false;
-    };
     Air.prototype.isLock1 = function () {
         return false;
     };
@@ -99,12 +93,6 @@ var Flux = /** @class */ (function () {
     function Flux() {
     }
     Flux.prototype.isAir = function () {
-        return false;
-    };
-    Flux.prototype.isFallingStone = function () {
-        return false;
-    };
-    Flux.prototype.isFallingBox = function () {
         return false;
     };
     Flux.prototype.isLock1 = function () {
@@ -142,12 +130,6 @@ var Unbreakable = /** @class */ (function () {
     Unbreakable.prototype.isAir = function () {
         return false;
     };
-    Unbreakable.prototype.isFallingStone = function () {
-        return false;
-    };
-    Unbreakable.prototype.isFallingBox = function () {
-        return false;
-    };
     Unbreakable.prototype.isLock1 = function () {
         return false;
     };
@@ -177,12 +159,6 @@ var Player = /** @class */ (function () {
     function Player() {
     }
     Player.prototype.isAir = function () {
-        return false;
-    };
-    Player.prototype.isFallingStone = function () {
-        return false;
-    };
-    Player.prototype.isFallingBox = function () {
         return false;
     };
     Player.prototype.isLock1 = function () {
@@ -218,12 +194,6 @@ var Stone = /** @class */ (function () {
     Stone.prototype.isAir = function () {
         return false;
     };
-    Stone.prototype.isFallingStone = function () {
-        return this.falling.isFalling();
-    };
-    Stone.prototype.isFallingBox = function () {
-        return false;
-    };
     Stone.prototype.isLock1 = function () {
         return false;
     };
@@ -231,7 +201,7 @@ var Stone = /** @class */ (function () {
         return false;
     };
     Stone.prototype.isFalling = function () {
-        return this.isFallingStone() || this.isFallingBox();
+        return this.falling.isFalling();
     };
     Stone.prototype.canFall = function () {
         return true;
@@ -265,12 +235,6 @@ var Box = /** @class */ (function () {
     Box.prototype.isAir = function () {
         return false;
     };
-    Box.prototype.isFallingStone = function () {
-        return false;
-    };
-    Box.prototype.isFallingBox = function () {
-        return this.falling.isFalling();
-    };
     Box.prototype.isLock1 = function () {
         return false;
     };
@@ -278,7 +242,7 @@ var Box = /** @class */ (function () {
         return false;
     };
     Box.prototype.isFalling = function () {
-        return this.isFallingStone() || this.isFallingBox();
+        return this.falling.isFalling();
     };
     Box.prototype.canFall = function () {
         return true;
@@ -308,12 +272,6 @@ var Key1 = /** @class */ (function () {
     function Key1() {
     }
     Key1.prototype.isAir = function () {
-        return false;
-    };
-    Key1.prototype.isFallingStone = function () {
-        return false;
-    };
-    Key1.prototype.isFallingBox = function () {
         return false;
     };
     Key1.prototype.isLock1 = function () {
@@ -353,12 +311,6 @@ var Lock1 = /** @class */ (function () {
     Lock1.prototype.isAir = function () {
         return false;
     };
-    Lock1.prototype.isFallingStone = function () {
-        return false;
-    };
-    Lock1.prototype.isFallingBox = function () {
-        return false;
-    };
     Lock1.prototype.isLock1 = function () {
         return true;
     };
@@ -388,12 +340,6 @@ var Key2 = /** @class */ (function () {
     function Key2() {
     }
     Key2.prototype.isAir = function () {
-        return false;
-    };
-    Key2.prototype.isFallingStone = function () {
-        return false;
-    };
-    Key2.prototype.isFallingBox = function () {
         return false;
     };
     Key2.prototype.isLock1 = function () {
@@ -431,12 +377,6 @@ var Lock2 = /** @class */ (function () {
     function Lock2() {
     }
     Lock2.prototype.isAir = function () {
-        return false;
-    };
-    Lock2.prototype.isFallingStone = function () {
-        return false;
-    };
-    Lock2.prototype.isFallingBox = function () {
         return false;
     };
     Lock2.prototype.isLock1 = function () {
