@@ -62,7 +62,6 @@ interface Tile {
   isLock2(): boolean;
 
   isFalling(): boolean;
-  canFall(): boolean;
 
   color(g: CanvasRenderingContext2D): void;
   draw(g: CanvasRenderingContext2D, x: number, y: number): void;
@@ -87,9 +86,6 @@ class Air implements Tile {
   }
 
   isFalling(): boolean {
-    return false;
-  }
-  canFall() {
     return false;
   }
 
@@ -120,9 +116,6 @@ class Flux implements Tile {
   }
 
   isFalling(): boolean {
-    return false;
-  }
-  canFall() {
     return false;
   }
 
@@ -159,9 +152,6 @@ class Unbreakable implements Tile {
   isFalling(): boolean {
     return false;
   }
-  canFall() {
-    return false;
-  }
 
   color(g: CanvasRenderingContext2D): void {
     g.fillStyle = "#999999";
@@ -190,9 +180,6 @@ class Player implements Tile {
   }
 
   isFalling(): boolean {
-    return false;
-  }
-  canFall() {
     return false;
   }
 
@@ -229,9 +216,6 @@ class Stone implements Tile {
 
   isFalling(): boolean {
     return this.falling.isFalling();
-  }
-  canFall() {
-    return true;
   }
 
   color(g: CanvasRenderingContext2D): void {
@@ -273,9 +257,6 @@ class Box implements Tile {
   isFalling(): boolean {
     return this.falling.isFalling();
   }
-  canFall() {
-    return true;
-  }
 
   color(g: CanvasRenderingContext2D): void {
     g.fillStyle = "#8b4513";
@@ -309,9 +290,6 @@ class Key1 implements Tile {
   }
 
   isFalling(): boolean {
-    return false;
-  }
-  canFall() {
     return false;
   }
 
@@ -350,9 +328,6 @@ class Lock1 implements Tile {
   isFalling(): boolean {
     return false;
   }
-  canFall() {
-    return false;
-  }
 
   color(g: CanvasRenderingContext2D): void {
     g.fillStyle = "#ffcc00";
@@ -381,9 +356,6 @@ class Key2 implements Tile {
   }
 
   isFalling(): boolean {
-    return false;
-  }
-  canFall() {
     return false;
   }
 
@@ -420,9 +392,6 @@ class Lock2 implements Tile {
   }
 
   isFalling(): boolean {
-    return false;
-  }
-  canFall() {
     return false;
   }
 

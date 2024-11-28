@@ -42,9 +42,7 @@ var Resting = /** @class */ (function () {
 var FallStrategy = /** @class */ (function () {
     function FallStrategy() {
     }
-    // constructor(private falling: Falling) {}
     FallStrategy.prototype.update = function (tile, x, y) {
-        // this.falling = map[y + 1][x].isAir() ? new Falling() : new Resting();
         this.drop(tile, x, y);
     };
     FallStrategy.prototype.drop = function (tile, x, y) {
@@ -71,9 +69,6 @@ var Air = /** @class */ (function () {
         return false;
     };
     Air.prototype.isFalling = function () {
-        return false;
-    };
-    Air.prototype.canFall = function () {
         return false;
     };
     Air.prototype.color = function (g) { };
@@ -103,9 +98,6 @@ var Flux = /** @class */ (function () {
         return false;
     };
     Flux.prototype.isFalling = function () {
-        return false;
-    };
-    Flux.prototype.canFall = function () {
         return false;
     };
     Flux.prototype.color = function (g) {
@@ -141,9 +133,6 @@ var Unbreakable = /** @class */ (function () {
     Unbreakable.prototype.isFalling = function () {
         return false;
     };
-    Unbreakable.prototype.canFall = function () {
-        return false;
-    };
     Unbreakable.prototype.color = function (g) {
         g.fillStyle = "#999999";
     };
@@ -171,9 +160,6 @@ var Player = /** @class */ (function () {
         return false;
     };
     Player.prototype.isFalling = function () {
-        return false;
-    };
-    Player.prototype.canFall = function () {
         return false;
     };
     Player.prototype.color = function (g) {
@@ -206,9 +192,6 @@ var Stone = /** @class */ (function () {
     };
     Stone.prototype.isFalling = function () {
         return this.falling.isFalling();
-    };
-    Stone.prototype.canFall = function () {
-        return true;
     };
     Stone.prototype.color = function (g) {
         g.fillStyle = "#0000cc";
@@ -245,9 +228,6 @@ var Box = /** @class */ (function () {
     Box.prototype.isFalling = function () {
         return this.falling.isFalling();
     };
-    Box.prototype.canFall = function () {
-        return true;
-    };
     Box.prototype.color = function (g) {
         g.fillStyle = "#8b4513";
     };
@@ -279,9 +259,6 @@ var Key1 = /** @class */ (function () {
         return false;
     };
     Key1.prototype.isFalling = function () {
-        return false;
-    };
-    Key1.prototype.canFall = function () {
         return false;
     };
     Key1.prototype.color = function (g) {
@@ -319,9 +296,6 @@ var Lock1 = /** @class */ (function () {
     Lock1.prototype.isFalling = function () {
         return false;
     };
-    Lock1.prototype.canFall = function () {
-        return false;
-    };
     Lock1.prototype.color = function (g) {
         g.fillStyle = "#ffcc00";
     };
@@ -349,9 +323,6 @@ var Key2 = /** @class */ (function () {
         return false;
     };
     Key2.prototype.isFalling = function () {
-        return false;
-    };
-    Key2.prototype.canFall = function () {
         return false;
     };
     Key2.prototype.color = function (g) {
@@ -387,9 +358,6 @@ var Lock2 = /** @class */ (function () {
         return true;
     };
     Lock2.prototype.isFalling = function () {
-        return false;
-    };
-    Lock2.prototype.canFall = function () {
         return false;
     };
     Lock2.prototype.color = function (g) {
