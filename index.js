@@ -40,11 +40,11 @@ var Resting = /** @class */ (function () {
     return Resting;
 }());
 var FallStrategy = /** @class */ (function () {
-    function FallStrategy(falling) {
-        this.falling = falling;
+    function FallStrategy() {
     }
+    // constructor(private falling: Falling) {}
     FallStrategy.prototype.update = function (tile, x, y) {
-        this.falling = map[y + 1][x].isAir() ? new Falling() : new Resting();
+        // this.falling = map[y + 1][x].isAir() ? new Falling() : new Resting();
         this.drop(tile, x, y);
     };
     FallStrategy.prototype.drop = function (tile, x, y) {
@@ -190,7 +190,7 @@ var Player = /** @class */ (function () {
 var Stone = /** @class */ (function () {
     function Stone(falling) {
         this.falling = falling;
-        this.fallStrategy = new FallStrategy(falling);
+        this.fallStrategy = new FallStrategy();
     }
     Stone.prototype.isAir = function () {
         return false;
@@ -228,7 +228,7 @@ var Stone = /** @class */ (function () {
 var Box = /** @class */ (function () {
     function Box(falling) {
         this.falling = falling;
-        this.fallStrategy = new FallStrategy(falling);
+        this.fallStrategy = new FallStrategy();
     }
     Box.prototype.isAir = function () {
         return false;

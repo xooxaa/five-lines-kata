@@ -41,10 +41,9 @@ class Resting implements FallingState {
 }
 
 class FallStrategy {
-  constructor(private falling: Falling) {}
+  constructor() {}
 
   update(tile: Tile, x: number, y: number): void {
-    this.falling = map[y + 1][x].isAir() ? new Falling() : new Resting();
     this.drop(tile, x, y);
   }
 
@@ -212,7 +211,7 @@ class Player implements Tile {
 class Stone implements Tile {
   private fallStrategy: FallStrategy;
   constructor(private falling: FallingState) {
-    this.fallStrategy = new FallStrategy(falling);
+    this.fallStrategy = new FallStrategy();
   }
 
   isAir() {
@@ -255,7 +254,7 @@ class Stone implements Tile {
 class Box implements Tile {
   private fallStrategy: FallStrategy;
   constructor(private falling: FallingState) {
-    this.fallStrategy = new FallStrategy(falling);
+    this.fallStrategy = new FallStrategy();
   }
 
   isAir() {
