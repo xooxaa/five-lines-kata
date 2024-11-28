@@ -58,6 +58,7 @@ class FallStrategy {
 
 interface Tile {
   isAir(): boolean;
+  isBox(): boolean;
   isLock1(): boolean;
   isLock2(): boolean;
 
@@ -75,6 +76,9 @@ interface Tile {
 class Air implements Tile {
   isAir() {
     return true;
+  }
+  isBox(): boolean {
+    return false;
   }
   isLock1() {
     return false;
@@ -104,6 +108,9 @@ class Air implements Tile {
 }
 class Flux implements Tile {
   isAir() {
+    return false;
+  }
+  isBox(): boolean {
     return false;
   }
   isLock1() {
@@ -140,6 +147,9 @@ class Unbreakable implements Tile {
   isAir() {
     return false;
   }
+  isBox(): boolean {
+    return false;
+  }
   isLock1() {
     return false;
   }
@@ -168,6 +178,9 @@ class Unbreakable implements Tile {
 }
 class Player implements Tile {
   isAir() {
+    return false;
+  }
+  isBox(): boolean {
     return false;
   }
   isLock1() {
@@ -203,6 +216,9 @@ class Stone implements Tile {
   }
 
   isAir() {
+    return false;
+  }
+  isBox(): boolean {
     return false;
   }
   isLock1() {
@@ -245,6 +261,9 @@ class Box implements Tile {
   isAir() {
     return false;
   }
+  isBox(): boolean {
+    return true;
+  }
   isLock1() {
     return false;
   }
@@ -278,6 +297,9 @@ class Box implements Tile {
 
 class Key1 implements Tile {
   isAir() {
+    return false;
+  }
+  isBox(): boolean {
     return false;
   }
   isLock1() {
@@ -316,6 +338,9 @@ class Lock1 implements Tile {
   isAir() {
     return false;
   }
+  isBox(): boolean {
+    return false;
+  }
   isLock1() {
     return true;
   }
@@ -344,6 +369,9 @@ class Lock1 implements Tile {
 }
 class Key2 implements Tile {
   isAir() {
+    return false;
+  }
+  isBox(): boolean {
     return false;
   }
   isLock1() {
@@ -380,6 +408,9 @@ class Key2 implements Tile {
 }
 class Lock2 implements Tile {
   isAir() {
+    return false;
+  }
+  isBox(): boolean {
     return false;
   }
   isLock1() {
@@ -562,10 +593,19 @@ function gameLoop() {
   let before = Date.now();
   update();
   draw();
+  resetOnWin();
   let after = Date.now();
   let frameTime = after - before;
   let sleep = SLEEP - frameTime;
   setTimeout(() => gameLoop(), sleep);
+}
+
+function resetOnWin() {
+  if (map[4][6].isBox()) {
+    transformMap();
+    playerx = 1;
+    playery = 1;
+  }
 }
 
 window.onload = () => {

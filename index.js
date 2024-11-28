@@ -61,6 +61,9 @@ var Air = /** @class */ (function () {
     Air.prototype.isAir = function () {
         return true;
     };
+    Air.prototype.isBox = function () {
+        return false;
+    };
     Air.prototype.isLock1 = function () {
         return false;
     };
@@ -88,6 +91,9 @@ var Flux = /** @class */ (function () {
     function Flux() {
     }
     Flux.prototype.isAir = function () {
+        return false;
+    };
+    Flux.prototype.isBox = function () {
         return false;
     };
     Flux.prototype.isLock1 = function () {
@@ -123,6 +129,9 @@ var Unbreakable = /** @class */ (function () {
     Unbreakable.prototype.isAir = function () {
         return false;
     };
+    Unbreakable.prototype.isBox = function () {
+        return false;
+    };
     Unbreakable.prototype.isLock1 = function () {
         return false;
     };
@@ -150,6 +159,9 @@ var Player = /** @class */ (function () {
     function Player() {
     }
     Player.prototype.isAir = function () {
+        return false;
+    };
+    Player.prototype.isBox = function () {
         return false;
     };
     Player.prototype.isLock1 = function () {
@@ -181,6 +193,9 @@ var Stone = /** @class */ (function () {
         this.fallStrategy = new FallStrategy(falling);
     }
     Stone.prototype.isAir = function () {
+        return false;
+    };
+    Stone.prototype.isBox = function () {
         return false;
     };
     Stone.prototype.isLock1 = function () {
@@ -218,6 +233,9 @@ var Box = /** @class */ (function () {
     Box.prototype.isAir = function () {
         return false;
     };
+    Box.prototype.isBox = function () {
+        return true;
+    };
     Box.prototype.isLock1 = function () {
         return false;
     };
@@ -249,6 +267,9 @@ var Key1 = /** @class */ (function () {
     function Key1() {
     }
     Key1.prototype.isAir = function () {
+        return false;
+    };
+    Key1.prototype.isBox = function () {
         return false;
     };
     Key1.prototype.isLock1 = function () {
@@ -286,6 +307,9 @@ var Lock1 = /** @class */ (function () {
     Lock1.prototype.isAir = function () {
         return false;
     };
+    Lock1.prototype.isBox = function () {
+        return false;
+    };
     Lock1.prototype.isLock1 = function () {
         return true;
     };
@@ -313,6 +337,9 @@ var Key2 = /** @class */ (function () {
     function Key2() {
     }
     Key2.prototype.isAir = function () {
+        return false;
+    };
+    Key2.prototype.isBox = function () {
         return false;
     };
     Key2.prototype.isLock1 = function () {
@@ -348,6 +375,9 @@ var Lock2 = /** @class */ (function () {
     function Lock2() {
     }
     Lock2.prototype.isAir = function () {
+        return false;
+    };
+    Lock2.prototype.isBox = function () {
         return false;
     };
     Lock2.prototype.isLock1 = function () {
@@ -522,10 +552,18 @@ function gameLoop() {
     var before = Date.now();
     update();
     draw();
+    resetOnWin();
     var after = Date.now();
     var frameTime = after - before;
     var sleep = SLEEP - frameTime;
     setTimeout(function () { return gameLoop(); }, sleep);
+}
+function resetOnWin() {
+    if (map[4][6].isBox()) {
+        transformMap();
+        playerx = 1;
+        playery = 1;
+    }
 }
 window.onload = function () {
     transformMap();
