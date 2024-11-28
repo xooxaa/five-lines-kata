@@ -16,6 +16,28 @@ var RawTile;
     RawTile[RawTile["KEY2"] = 10] = "KEY2";
     RawTile[RawTile["LOCK2"] = 11] = "LOCK2";
 })(RawTile || (RawTile = {}));
+var Falling = /** @class */ (function () {
+    function Falling() {
+    }
+    Falling.prototype.isFalling = function () {
+        return true;
+    };
+    Falling.prototype.isResting = function () {
+        return false;
+    };
+    return Falling;
+}());
+var Resting = /** @class */ (function () {
+    function Resting() {
+    }
+    Resting.prototype.isFalling = function () {
+        return false;
+    };
+    Resting.prototype.isResting = function () {
+        return true;
+    };
+    return Resting;
+}());
 var Air = /** @class */ (function () {
     function Air() {
     }
@@ -60,6 +82,12 @@ var Air = /** @class */ (function () {
     };
     Air.prototype.isPushable = function () {
         return this.isStone() || this.isBox();
+    };
+    Air.prototype.isStony = function () {
+        return this.isStone() || this.isFallingStone();
+    };
+    Air.prototype.isBoxy = function () {
+        return this.isBox() || this.isFallingBox();
     };
     Air.prototype.color = function (g) { };
     Air.prototype.draw = function (g, x, y) { };
@@ -115,6 +143,12 @@ var Flux = /** @class */ (function () {
     };
     Flux.prototype.isPushable = function () {
         return this.isStone() || this.isBox();
+    };
+    Flux.prototype.isStony = function () {
+        return this.isStone() || this.isFallingStone();
+    };
+    Flux.prototype.isBoxy = function () {
+        return this.isBox() || this.isFallingBox();
     };
     Flux.prototype.color = function (g) {
         g.fillStyle = "#ccffcc";
@@ -175,6 +209,12 @@ var Unbreakable = /** @class */ (function () {
     Unbreakable.prototype.isPushable = function () {
         return this.isStone() || this.isBox();
     };
+    Unbreakable.prototype.isStony = function () {
+        return this.isStone() || this.isFallingStone();
+    };
+    Unbreakable.prototype.isBoxy = function () {
+        return this.isBox() || this.isFallingBox();
+    };
     Unbreakable.prototype.color = function (g) {
         g.fillStyle = "#999999";
     };
@@ -230,6 +270,12 @@ var Player = /** @class */ (function () {
     Player.prototype.isPushable = function () {
         return this.isStone() || this.isBox();
     };
+    Player.prototype.isStony = function () {
+        return this.isStone() || this.isFallingStone();
+    };
+    Player.prototype.isBoxy = function () {
+        return this.isBox() || this.isFallingBox();
+    };
     Player.prototype.color = function (g) {
         g.fillStyle = "#ff0000";
     };
@@ -241,7 +287,8 @@ var Player = /** @class */ (function () {
     return Player;
 }());
 var Stone = /** @class */ (function () {
-    function Stone() {
+    function Stone(falling) {
+        this.falling = falling;
     }
     Stone.prototype.isAir = function () {
         return false;
@@ -259,7 +306,7 @@ var Stone = /** @class */ (function () {
         return true;
     };
     Stone.prototype.isFallingStone = function () {
-        return false;
+        return this.falling.isFalling();
     };
     Stone.prototype.isBox = function () {
         return false;
@@ -283,7 +330,13 @@ var Stone = /** @class */ (function () {
         return this.isFlux() || this.isAir();
     };
     Stone.prototype.isPushable = function () {
-        return true;
+        return this.isStone() || this.isBox();
+    };
+    Stone.prototype.isStony = function () {
+        return this.isStone() || this.isFallingStone();
+    };
+    Stone.prototype.isBoxy = function () {
+        return this.isBox() || this.isFallingBox();
     };
     Stone.prototype.color = function (g) {
         g.fillStyle = "#0000cc";
@@ -292,71 +345,19 @@ var Stone = /** @class */ (function () {
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     };
     Stone.prototype.moveHorizontal = function (dx) {
-        if (map[playery][playerx + dx + dx].isAir() && !map[playery + 1][playerx + dx].isAir()) {
-            map[playery][playerx + dx + dx] = this;
-            moveToTile(playerx + dx, playery);
+        if (this.isFallingStone() === false) {
+            if (map[playery][playerx + dx + dx].isAir() && !map[playery + 1][playerx + dx].isAir()) {
+                map[playery][playerx + dx + dx] = this;
+                moveToTile(playerx + dx, playery);
+            }
         }
     };
     Stone.prototype.moveVertical = function (dy) { };
     return Stone;
 }());
-var FallingStone = /** @class */ (function () {
-    function FallingStone() {
-    }
-    FallingStone.prototype.isAir = function () {
-        return false;
-    };
-    FallingStone.prototype.isFlux = function () {
-        return false;
-    };
-    FallingStone.prototype.isUnbreakable = function () {
-        return false;
-    };
-    FallingStone.prototype.isPlayer = function () {
-        return false;
-    };
-    FallingStone.prototype.isStone = function () {
-        return false;
-    };
-    FallingStone.prototype.isFallingStone = function () {
-        return true;
-    };
-    FallingStone.prototype.isBox = function () {
-        return false;
-    };
-    FallingStone.prototype.isFallingBox = function () {
-        return false;
-    };
-    FallingStone.prototype.isKey1 = function () {
-        return false;
-    };
-    FallingStone.prototype.isLock1 = function () {
-        return false;
-    };
-    FallingStone.prototype.isKey2 = function () {
-        return false;
-    };
-    FallingStone.prototype.isLock2 = function () {
-        return false;
-    };
-    FallingStone.prototype.isEdible = function () {
-        return this.isFlux() || this.isAir();
-    };
-    FallingStone.prototype.isPushable = function () {
-        return this.isStone() || this.isBox();
-    };
-    FallingStone.prototype.color = function (g) {
-        g.fillStyle = "#0000cc";
-    };
-    FallingStone.prototype.draw = function (g, x, y) {
-        g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-    };
-    FallingStone.prototype.moveHorizontal = function (dx) { };
-    FallingStone.prototype.moveVertical = function (dy) { };
-    return FallingStone;
-}());
 var Box = /** @class */ (function () {
-    function Box() {
+    function Box(falling) {
+        this.falling = falling;
     }
     Box.prototype.isAir = function () {
         return false;
@@ -380,7 +381,7 @@ var Box = /** @class */ (function () {
         return true;
     };
     Box.prototype.isFallingBox = function () {
-        return false;
+        return this.falling.isFalling();
     };
     Box.prototype.isKey1 = function () {
         return false;
@@ -398,7 +399,13 @@ var Box = /** @class */ (function () {
         return this.isFlux() || this.isAir();
     };
     Box.prototype.isPushable = function () {
-        return true;
+        return this.isStone() || this.isBox();
+    };
+    Box.prototype.isStony = function () {
+        return this.isStone() || this.isFallingStone();
+    };
+    Box.prototype.isBoxy = function () {
+        return this.isBox() || this.isFallingBox();
     };
     Box.prototype.color = function (g) {
         g.fillStyle = "#8b4513";
@@ -407,68 +414,15 @@ var Box = /** @class */ (function () {
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     };
     Box.prototype.moveHorizontal = function (dx) {
-        if (map[playery][playerx + dx + dx].isAir() && !map[playery + 1][playerx + dx].isAir()) {
-            map[playery][playerx + dx + dx] = this;
-            moveToTile(playerx + dx, playery);
+        if (this.isFallingBox() === false) {
+            if (map[playery][playerx + dx + dx].isAir() && !map[playery + 1][playerx + dx].isAir()) {
+                map[playery][playerx + dx + dx] = this;
+                moveToTile(playerx + dx, playery);
+            }
         }
     };
     Box.prototype.moveVertical = function (dy) { };
     return Box;
-}());
-var FallingBox = /** @class */ (function () {
-    function FallingBox() {
-    }
-    FallingBox.prototype.isAir = function () {
-        return false;
-    };
-    FallingBox.prototype.isFlux = function () {
-        return false;
-    };
-    FallingBox.prototype.isUnbreakable = function () {
-        return false;
-    };
-    FallingBox.prototype.isPlayer = function () {
-        return false;
-    };
-    FallingBox.prototype.isStone = function () {
-        return false;
-    };
-    FallingBox.prototype.isFallingStone = function () {
-        return false;
-    };
-    FallingBox.prototype.isBox = function () {
-        return false;
-    };
-    FallingBox.prototype.isFallingBox = function () {
-        return true;
-    };
-    FallingBox.prototype.isKey1 = function () {
-        return false;
-    };
-    FallingBox.prototype.isLock1 = function () {
-        return false;
-    };
-    FallingBox.prototype.isKey2 = function () {
-        return false;
-    };
-    FallingBox.prototype.isLock2 = function () {
-        return false;
-    };
-    FallingBox.prototype.isEdible = function () {
-        return this.isFlux() || this.isAir();
-    };
-    FallingBox.prototype.isPushable = function () {
-        return this.isStone() || this.isBox();
-    };
-    FallingBox.prototype.color = function (g) {
-        g.fillStyle = "#8b4513";
-    };
-    FallingBox.prototype.draw = function (g, x, y) {
-        g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-    };
-    FallingBox.prototype.moveHorizontal = function (dx) { };
-    FallingBox.prototype.moveVertical = function (dy) { };
-    return FallingBox;
 }());
 var Key1 = /** @class */ (function () {
     function Key1() {
@@ -514,6 +468,12 @@ var Key1 = /** @class */ (function () {
     };
     Key1.prototype.isPushable = function () {
         return this.isStone() || this.isBox();
+    };
+    Key1.prototype.isStony = function () {
+        return this.isStone() || this.isFallingStone();
+    };
+    Key1.prototype.isBoxy = function () {
+        return this.isBox() || this.isFallingBox();
     };
     Key1.prototype.color = function (g) {
         g.fillStyle = "#ffcc00";
@@ -576,6 +536,12 @@ var Lock1 = /** @class */ (function () {
     Lock1.prototype.isPushable = function () {
         return this.isStone() || this.isBox();
     };
+    Lock1.prototype.isStony = function () {
+        return this.isStone() || this.isFallingStone();
+    };
+    Lock1.prototype.isBoxy = function () {
+        return this.isBox() || this.isFallingBox();
+    };
     Lock1.prototype.color = function (g) {
         g.fillStyle = "#ffcc00";
     };
@@ -630,6 +596,12 @@ var Key2 = /** @class */ (function () {
     };
     Key2.prototype.isPushable = function () {
         return this.isStone() || this.isBox();
+    };
+    Key2.prototype.isStony = function () {
+        return this.isStone() || this.isFallingStone();
+    };
+    Key2.prototype.isBoxy = function () {
+        return this.isBox() || this.isFallingBox();
     };
     Key2.prototype.color = function (g) {
         g.fillStyle = "#00ccff";
@@ -691,6 +663,12 @@ var Lock2 = /** @class */ (function () {
     };
     Lock2.prototype.isPushable = function () {
         return this.isStone() || this.isBox();
+    };
+    Lock2.prototype.isStony = function () {
+        return this.isStone() || this.isFallingStone();
+    };
+    Lock2.prototype.isBoxy = function () {
+        return this.isBox() || this.isFallingBox();
     };
     Lock2.prototype.color = function (g) {
         g.fillStyle = "#00ccff";
@@ -808,13 +786,13 @@ function transformTile(tile) {
         case RawTile.PLAYER:
             return new Player();
         case RawTile.STONE:
-            return new Stone();
+            return new Stone(new Resting());
         case RawTile.FALLING_STONE:
-            return new FallingStone();
+            return new Stone(new Falling());
         case RawTile.BOX:
-            return new Box();
+            return new Box(new Resting());
         case RawTile.FALLING_BOX:
-            return new FallingBox();
+            return new Box(new Falling());
         case RawTile.KEY1:
             return new Key1();
         case RawTile.LOCK1:
@@ -878,19 +856,19 @@ function updateMap() {
     }
 }
 function updateTile(x, y) {
-    if ((map[y][x].isStone() || map[y][x].isFallingStone()) && map[y + 1][x].isAir()) {
-        map[y + 1][x] = new FallingStone();
+    if (map[y][x].isStony() && map[y + 1][x].isAir()) {
+        map[y + 1][x] = new Stone(new Falling());
         map[y][x] = new Air();
     }
-    else if ((map[y][x].isBox() || map[y][x].isFallingBox()) && map[y + 1][x].isAir()) {
-        map[y + 1][x] = new FallingBox();
+    else if (map[y][x].isBoxy() && map[y + 1][x].isAir()) {
+        map[y + 1][x] = new Box(new Falling());
         map[y][x] = new Air();
     }
     else if (map[y][x].isFallingStone()) {
-        map[y][x] = new Stone();
+        map[y][x] = new Stone(new Resting());
     }
     else if (map[y][x].isFallingBox()) {
-        map[y][x] = new Box();
+        map[y][x] = new Box(new Resting());
     }
 }
 function draw() {
