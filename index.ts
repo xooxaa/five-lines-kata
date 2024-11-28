@@ -420,6 +420,13 @@ class Down implements Input {
     map[playery + 1][playerx].moveVertical(1);
   }
 }
+class Reset implements Input {
+  handle() {
+    transformMap();
+    playerx = 1;
+    playery = 1;
+  }
+}
 
 let playerx = 1;
 let playery = 1;
@@ -574,9 +581,11 @@ const LEFT_KEY = "ArrowLeft";
 const UP_KEY = "ArrowUp";
 const RIGHT_KEY = "ArrowRight";
 const DOWN_KEY = "ArrowDown";
+const RESET_KEY = "r";
 window.addEventListener("keydown", (e) => {
   if (e.key === LEFT_KEY || e.key === "a") inputs.push(new Left());
   else if (e.key === UP_KEY || e.key === "w") inputs.push(new Up());
   else if (e.key === RIGHT_KEY || e.key === "d") inputs.push(new Right());
   else if (e.key === DOWN_KEY || e.key === "s") inputs.push(new Down());
+  else if (e.key === RESET_KEY) inputs.push(new Reset());
 });

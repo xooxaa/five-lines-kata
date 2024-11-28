@@ -403,6 +403,16 @@ var Down = /** @class */ (function () {
     };
     return Down;
 }());
+var Reset = /** @class */ (function () {
+    function Reset() {
+    }
+    Reset.prototype.handle = function () {
+        transformMap();
+        playerx = 1;
+        playery = 1;
+    };
+    return Reset;
+}());
 var playerx = 1;
 var playery = 1;
 var inputs = [];
@@ -541,6 +551,7 @@ var LEFT_KEY = "ArrowLeft";
 var UP_KEY = "ArrowUp";
 var RIGHT_KEY = "ArrowRight";
 var DOWN_KEY = "ArrowDown";
+var RESET_KEY = "r";
 window.addEventListener("keydown", function (e) {
     if (e.key === LEFT_KEY || e.key === "a")
         inputs.push(new Left());
@@ -550,4 +561,6 @@ window.addEventListener("keydown", function (e) {
         inputs.push(new Right());
     else if (e.key === DOWN_KEY || e.key === "s")
         inputs.push(new Down());
+    else if (e.key === RESET_KEY)
+        inputs.push(new Reset());
 });
