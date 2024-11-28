@@ -1,4 +1,4 @@
-var TILE_SIZE = 32;
+var TILE_SIZE = 40;
 var FPS = 30;
 var SLEEP = 1000 / FPS;
 var RawTile;
