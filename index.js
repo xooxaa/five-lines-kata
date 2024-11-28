@@ -4,6 +4,10 @@ var Falling = /** @class */ (function () {
     Falling.prototype.isFalling = function () {
         return true;
     };
+    Falling.prototype.drop = function (tile, x, y) {
+        map[y + 1][x] = tile;
+        map[y][x] = new Air();
+    };
     Falling.prototype.moveHorizontal = function (tile, dx) { };
     return Falling;
 }());
@@ -13,6 +17,7 @@ var Resting = /** @class */ (function () {
     Resting.prototype.isFalling = function () {
         return false;
     };
+    Resting.prototype.drop = function (tile, x, y) { };
     Resting.prototype.moveHorizontal = function (tile, dx) {
         if (map[playery][playerx + dx + dx].isAir() && !map[playery + 1][playerx + dx].isAir()) {
             map[playery][playerx + dx + dx] = tile;
@@ -22,16 +27,15 @@ var Resting = /** @class */ (function () {
     return Resting;
 }());
 var FallingStrategy = /** @class */ (function () {
-    function FallingStrategy() {
+    function FallingStrategy(falling) {
+        this.falling = falling;
     }
     FallingStrategy.prototype.update = function (tile, x, y) {
-        this.drop(tile, x, y);
+        this.falling = map[y + 1][x].getBlockOnTopState();
+        this.falling.drop(tile, x, y);
     };
-    FallingStrategy.prototype.drop = function (tile, x, y) {
-        if (map[y + 1][x].isAir()) {
-            map[y + 1][x] = tile;
-            map[y][x] = new Air();
-        }
+    FallingStrategy.prototype.moveHorizontal = function (tile, dx) {
+        this.falling.moveHorizontal(tile, dx);
     };
     return FallingStrategy;
 }());
@@ -86,7 +90,9 @@ var Air = /** @class */ (function () {
     Air.prototype.isFalling = function () {
         return false;
     };
-    Air.prototype.draw = function (g, x, y) { };
+    Air.prototype.getBlockOnTopState = function () {
+        return new Falling();
+    };
     Air.prototype.moveHorizontal = function (dx) {
         moveToTile(playerx + dx, playery);
     };
@@ -94,6 +100,7 @@ var Air = /** @class */ (function () {
         moveToTile(playerx, playery + dy);
     };
     Air.prototype.update = function (x, y) { };
+    Air.prototype.draw = function (g, x, y) { };
     return Air;
 }());
 var Flux = /** @class */ (function () {
@@ -113,6 +120,9 @@ var Flux = /** @class */ (function () {
     };
     Flux.prototype.isFalling = function () {
         return false;
+    };
+    Flux.prototype.getBlockOnTopState = function () {
+        return new Resting();
     };
     Flux.prototype.draw = function (g, x, y) {
         g.fillStyle = "#ccffcc";
@@ -145,13 +155,16 @@ var Unbreakable = /** @class */ (function () {
     Unbreakable.prototype.isFalling = function () {
         return false;
     };
-    Unbreakable.prototype.draw = function (g, x, y) {
-        g.fillStyle = "#999999";
-        g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+    Unbreakable.prototype.getBlockOnTopState = function () {
+        return new Resting();
     };
     Unbreakable.prototype.moveHorizontal = function (dx) { };
     Unbreakable.prototype.moveVertical = function (dy) { };
     Unbreakable.prototype.update = function (x, y) { };
+    Unbreakable.prototype.draw = function (g, x, y) {
+        g.fillStyle = "#999999";
+        g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+    };
     return Unbreakable;
 }());
 var Player = /** @class */ (function () {
@@ -172,19 +185,22 @@ var Player = /** @class */ (function () {
     Player.prototype.isFalling = function () {
         return false;
     };
-    Player.prototype.draw = function (g, x, y) {
-        g.fillStyle = "#ff0000";
-        g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+    Player.prototype.getBlockOnTopState = function () {
+        return new Resting();
     };
     Player.prototype.moveHorizontal = function (dx) { };
     Player.prototype.moveVertical = function (dy) { };
     Player.prototype.update = function (x, y) { };
+    Player.prototype.draw = function (g, x, y) {
+        g.fillStyle = "#ff0000";
+        g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+    };
     return Player;
 }());
 var Stone = /** @class */ (function () {
     function Stone(falling) {
         this.falling = falling;
-        this.fallingStrategy = new FallingStrategy();
+        this.fallingStrategy = new FallingStrategy(this.falling);
     }
     Stone.prototype.isAir = function () {
         return false;
@@ -201,23 +217,26 @@ var Stone = /** @class */ (function () {
     Stone.prototype.isFalling = function () {
         return this.falling.isFalling();
     };
-    Stone.prototype.draw = function (g, x, y) {
-        g.fillStyle = "#0000cc";
-        g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+    Stone.prototype.getBlockOnTopState = function () {
+        return new Resting();
     };
     Stone.prototype.moveHorizontal = function (dx) {
-        this.falling.moveHorizontal(this, dx);
+        this.fallingStrategy.moveHorizontal(this, dx);
     };
     Stone.prototype.moveVertical = function (dy) { };
     Stone.prototype.update = function (x, y) {
         this.fallingStrategy.update(this, x, y);
+    };
+    Stone.prototype.draw = function (g, x, y) {
+        g.fillStyle = "#0000cc";
+        g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     };
     return Stone;
 }());
 var Box = /** @class */ (function () {
     function Box(falling) {
         this.falling = falling;
-        this.fallingStrategy = new FallingStrategy();
+        this.fallingStrategy = new FallingStrategy(this.falling);
     }
     Box.prototype.isAir = function () {
         return false;
@@ -234,16 +253,19 @@ var Box = /** @class */ (function () {
     Box.prototype.isFalling = function () {
         return this.falling.isFalling();
     };
-    Box.prototype.draw = function (g, x, y) {
-        g.fillStyle = "#8b4513";
-        g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+    Box.prototype.getBlockOnTopState = function () {
+        return new Resting();
     };
     Box.prototype.moveHorizontal = function (dx) {
-        this.falling.moveHorizontal(this, dx);
+        this.fallingStrategy.moveHorizontal(this, dx);
     };
     Box.prototype.moveVertical = function (dy) { };
     Box.prototype.update = function (x, y) {
         this.fallingStrategy.update(this, x, y);
+    };
+    Box.prototype.draw = function (g, x, y) {
+        g.fillStyle = "#8b4513";
+        g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     };
     return Box;
 }());
@@ -266,9 +288,8 @@ var Key = /** @class */ (function () {
     Key.prototype.isFalling = function () {
         return false;
     };
-    Key.prototype.draw = function (g, x, y) {
-        this.keyConf.setColor(g);
-        g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+    Key.prototype.getBlockOnTopState = function () {
+        return new Resting();
     };
     Key.prototype.moveHorizontal = function (dx) {
         this.keyConf.removeLock();
@@ -279,6 +300,10 @@ var Key = /** @class */ (function () {
         moveToTile(playerx, playery + dy);
     };
     Key.prototype.update = function (x, y) { };
+    Key.prototype.draw = function (g, x, y) {
+        this.keyConf.setColor(g);
+        g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+    };
     return Key;
 }());
 var Locked = /** @class */ (function () {
@@ -300,13 +325,16 @@ var Locked = /** @class */ (function () {
     Locked.prototype.isFalling = function () {
         return false;
     };
-    Locked.prototype.draw = function (g, x, y) {
-        this.keyConf.setColor(g);
-        g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+    Locked.prototype.getBlockOnTopState = function () {
+        return new Resting();
     };
     Locked.prototype.moveHorizontal = function (dx) { };
     Locked.prototype.moveVertical = function (dy) { };
     Locked.prototype.update = function (x, y) { };
+    Locked.prototype.draw = function (g, x, y) {
+        this.keyConf.setColor(g);
+        g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+    };
     return Locked;
 }());
 var Right = /** @class */ (function () {
