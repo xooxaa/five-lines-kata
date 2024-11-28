@@ -43,9 +43,6 @@ var FallStrategy = /** @class */ (function () {
     function FallStrategy(falling) {
         this.falling = falling;
     }
-    FallStrategy.prototype.getFalling = function () {
-        return this.falling;
-    };
     FallStrategy.prototype.update = function (tile, x, y) {
         this.falling = map[y + 1][x].isAir() ? new Falling() : new Resting();
         this.drop(tile, x, y);

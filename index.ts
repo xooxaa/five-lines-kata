@@ -43,10 +43,6 @@ class Resting implements FallingState {
 class FallStrategy {
   constructor(private falling: Falling) {}
 
-  getFalling() {
-    return this.falling;
-  }
-
   update(tile: Tile, x: number, y: number): void {
     this.falling = map[y + 1][x].isAir() ? new Falling() : new Resting();
     this.drop(tile, x, y);
