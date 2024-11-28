@@ -40,22 +40,33 @@ class Resting implements FallingState {
   }
 }
 
+class FallStrategy {
+  constructor(private falling: Falling) {}
+
+  getFalling() {
+    return this.falling;
+  }
+
+  update(tile: Tile, x: number, y: number): void {
+    this.falling = map[y + 1][x].isAir() ? new Falling() : new Resting();
+    this.drop(tile, x, y);
+  }
+
+  private drop(tile: Tile, x: number, y: number) {
+    if (map[y + 1][x].isAir()) {
+      map[y + 1][x] = tile;
+      map[y][x] = new Air();
+    }
+  }
+}
+
 interface Tile {
   isAir(): boolean;
-  isFlux(): boolean;
-  isUnbreakable(): boolean;
-  isPlayer(): boolean;
-  isStone(): boolean;
   isFallingStone(): boolean;
-  isBox(): boolean;
   isFallingBox(): boolean;
-  isKey1(): boolean;
   isLock1(): boolean;
-  isKey2(): boolean;
   isLock2(): boolean;
 
-  isEdible(): boolean;
-  isPushable(): boolean;
   isFalling(): boolean;
   canFall(): boolean;
 
@@ -75,51 +86,24 @@ class Air implements Tile {
   isAir() {
     return true;
   }
-  isFlux() {
-    return false;
-  }
-  isUnbreakable() {
-    return false;
-  }
-  isPlayer() {
-    return false;
-  }
-  isStone() {
-    return false;
-  }
   isFallingStone() {
-    return false;
-  }
-  isBox() {
     return false;
   }
   isFallingBox() {
     return false;
   }
-  isKey1() {
-    return false;
-  }
   isLock1() {
-    return false;
-  }
-  isKey2() {
     return false;
   }
   isLock2() {
     return false;
   }
 
-  isEdible() {
-    return true;
-  }
-  isPushable() {
-    return this.isStone() || this.isBox();
-  }
   isFalling(): boolean {
-    return this.isFallingStone() || this.isFallingBox();
+    return false;
   }
   canFall() {
-    return this.isStone() || this.isBox();
+    return false;
   }
 
   rest(): void {}
@@ -131,7 +115,6 @@ class Air implements Tile {
   moveHorizontal(dx: number): void {
     moveToTile(playerx + dx, playery);
   }
-
   moveVertical(dy: number): void {
     moveToTile(playerx, playery + dy);
   }
@@ -142,51 +125,24 @@ class Flux implements Tile {
   isAir() {
     return false;
   }
-  isFlux() {
-    return true;
-  }
-  isUnbreakable() {
-    return false;
-  }
-  isPlayer() {
-    return false;
-  }
-  isStone() {
-    return false;
-  }
   isFallingStone() {
-    return false;
-  }
-  isBox() {
     return false;
   }
   isFallingBox() {
     return false;
   }
-  isKey1() {
-    return false;
-  }
   isLock1() {
-    return false;
-  }
-  isKey2() {
     return false;
   }
   isLock2() {
     return false;
   }
 
-  isEdible() {
-    return this.isFlux() || this.isAir();
-  }
-  isPushable() {
-    return this.isStone() || this.isBox();
-  }
   isFalling(): boolean {
-    return this.isFallingStone() || this.isFallingBox();
+    return false;
   }
   canFall() {
-    return this.isStone() || this.isBox();
+    return false;
   }
 
   rest(): void {}
@@ -212,51 +168,24 @@ class Unbreakable implements Tile {
   isAir() {
     return false;
   }
-  isFlux() {
-    return false;
-  }
-  isUnbreakable() {
-    return true;
-  }
-  isPlayer() {
-    return false;
-  }
-  isStone() {
-    return false;
-  }
   isFallingStone() {
-    return false;
-  }
-  isBox() {
     return false;
   }
   isFallingBox() {
     return false;
   }
-  isKey1() {
-    return false;
-  }
   isLock1() {
-    return false;
-  }
-  isKey2() {
     return false;
   }
   isLock2() {
     return false;
   }
 
-  isEdible() {
-    return this.isFlux() || this.isAir();
-  }
-  isPushable() {
-    return this.isStone() || this.isBox();
-  }
   isFalling(): boolean {
-    return this.isFallingStone() || this.isFallingBox();
+    return false;
   }
   canFall() {
-    return this.isStone() || this.isBox();
+    return false;
   }
 
   rest(): void {}
@@ -278,51 +207,24 @@ class Player implements Tile {
   isAir() {
     return false;
   }
-  isFlux() {
-    return false;
-  }
-  isUnbreakable() {
-    return false;
-  }
-  isPlayer() {
-    return true;
-  }
-  isStone() {
-    return false;
-  }
   isFallingStone() {
-    return false;
-  }
-  isBox() {
     return false;
   }
   isFallingBox() {
     return false;
   }
-  isKey1() {
-    return false;
-  }
   isLock1() {
-    return false;
-  }
-  isKey2() {
     return false;
   }
   isLock2() {
     return false;
   }
 
-  isEdible() {
-    return true;
-  }
-  isPushable() {
-    return this.isStone() || this.isBox();
-  }
   isFalling(): boolean {
-    return this.isFallingStone() || this.isFallingBox();
+    return false;
   }
   canFall() {
-    return this.isStone() || this.isBox();
+    return false;
   }
 
   rest(): void {}
@@ -341,56 +243,32 @@ class Player implements Tile {
   update(x: number, y: number): void {}
 }
 class Stone implements Tile {
-  constructor(private falling: FallingState) {}
+  private fallStrategy: FallStrategy;
+  constructor(private falling: FallingState) {
+    this.fallStrategy = new FallStrategy(falling);
+  }
 
   isAir() {
     return false;
   }
-  isFlux() {
-    return false;
-  }
-  isUnbreakable() {
-    return false;
-  }
-  isPlayer() {
-    return false;
-  }
-  isStone() {
-    return true;
-  }
   isFallingStone() {
     return this.falling.isFalling();
-  }
-  isBox() {
-    return false;
   }
   isFallingBox() {
     return false;
   }
-  isKey1() {
-    return false;
-  }
   isLock1() {
-    return false;
-  }
-  isKey2() {
     return false;
   }
   isLock2() {
     return false;
   }
 
-  isEdible() {
-    return this.isFlux() || this.isAir();
-  }
-  isPushable() {
-    return this.isStone() || this.isBox();
-  }
   isFalling(): boolean {
     return this.isFallingStone() || this.isFallingBox();
   }
   canFall() {
-    return this.isStone() || this.isBox();
+    return true;
   }
 
   rest(): void {
@@ -413,67 +291,37 @@ class Stone implements Tile {
   moveVertical(dy: number): void {}
 
   update(x: number, y: number): void {
-    if (map[y + 1][x].isAir()) {
-      this.falling = new Falling();
-      map[y + 1][x] = this;
-      map[y][x] = new Air();
-    } else if (this.falling.isFalling()) {
-      this.falling = new Resting();
-    }
+    this.fallStrategy.update(this, x, y);
   }
 }
 
 class Box implements Tile {
-  constructor(private falling: FallingState) {}
+  private fallStrategy: FallStrategy;
+  constructor(private falling: FallingState) {
+    this.fallStrategy = new FallStrategy(falling);
+  }
 
   isAir() {
-    return false;
-  }
-  isFlux() {
-    return false;
-  }
-  isUnbreakable() {
-    return false;
-  }
-  isPlayer() {
-    return false;
-  }
-  isStone() {
     return false;
   }
   isFallingStone() {
     return false;
   }
-  isBox() {
-    return true;
-  }
   isFallingBox() {
     return this.falling.isFalling();
   }
-  isKey1() {
-    return false;
-  }
   isLock1() {
-    return false;
-  }
-  isKey2() {
     return false;
   }
   isLock2() {
     return false;
   }
 
-  isEdible() {
-    return this.isFlux() || this.isAir();
-  }
-  isPushable() {
-    return this.isStone() || this.isBox();
-  }
   isFalling(): boolean {
     return this.isFallingStone() || this.isFallingBox();
   }
   canFall() {
-    return this.isStone() || this.isBox();
+    return true;
   }
 
   rest(): void {
@@ -496,13 +344,7 @@ class Box implements Tile {
   moveVertical(dy: number): void {}
 
   update(x: number, y: number): void {
-    if (map[y + 1][x].isAir()) {
-      this.falling = new Falling();
-      map[y + 1][x] = this;
-      map[y][x] = new Air();
-    } else if (this.falling.isFalling()) {
-      this.falling = new Resting();
-    }
+    this.fallStrategy.update(this, x, y);
   }
 }
 
@@ -510,51 +352,24 @@ class Key1 implements Tile {
   isAir() {
     return false;
   }
-  isFlux() {
-    return false;
-  }
-  isUnbreakable() {
-    return false;
-  }
-  isPlayer() {
-    return false;
-  }
-  isStone() {
-    return false;
-  }
   isFallingStone() {
-    return false;
-  }
-  isBox() {
     return false;
   }
   isFallingBox() {
     return false;
   }
-  isKey1() {
-    return true;
-  }
   isLock1() {
-    return false;
-  }
-  isKey2() {
     return false;
   }
   isLock2() {
     return false;
   }
 
-  isEdible() {
-    return this.isFlux() || this.isAir();
-  }
-  isPushable() {
-    return this.isStone() || this.isBox();
-  }
   isFalling(): boolean {
-    return this.isFallingStone() || this.isFallingBox();
+    return false;
   }
   canFall() {
-    return this.isStone() || this.isBox();
+    return false;
   }
 
   rest(): void {}
@@ -582,51 +397,24 @@ class Lock1 implements Tile {
   isAir() {
     return false;
   }
-  isFlux() {
-    return false;
-  }
-  isUnbreakable() {
-    return false;
-  }
-  isPlayer() {
-    return false;
-  }
-  isStone() {
-    return false;
-  }
   isFallingStone() {
-    return false;
-  }
-  isBox() {
     return false;
   }
   isFallingBox() {
     return false;
   }
-  isKey1() {
-    return false;
-  }
   isLock1() {
     return true;
-  }
-  isKey2() {
-    return false;
   }
   isLock2() {
     return false;
   }
 
-  isEdible() {
-    return this.isFlux() || this.isAir();
-  }
-  isPushable() {
-    return this.isStone() || this.isBox();
-  }
   isFalling(): boolean {
-    return this.isFallingStone() || this.isFallingBox();
+    return false;
   }
   canFall() {
-    return this.isStone() || this.isBox();
+    return false;
   }
 
   rest(): void {}
@@ -648,51 +436,24 @@ class Key2 implements Tile {
   isAir() {
     return false;
   }
-  isFlux() {
-    return false;
-  }
-  isUnbreakable() {
-    return false;
-  }
-  isPlayer() {
-    return false;
-  }
-  isStone() {
-    return false;
-  }
   isFallingStone() {
-    return false;
-  }
-  isBox() {
     return false;
   }
   isFallingBox() {
     return false;
   }
-  isKey1() {
-    return false;
-  }
   isLock1() {
     return false;
-  }
-  isKey2() {
-    return true;
   }
   isLock2() {
     return false;
   }
 
-  isEdible() {
-    return this.isFlux() || this.isAir();
-  }
-  isPushable() {
-    return this.isStone() || this.isBox();
-  }
   isFalling(): boolean {
-    return this.isFallingStone() || this.isFallingBox();
+    return false;
   }
   canFall() {
-    return this.isStone() || this.isBox();
+    return false;
   }
 
   rest(): void {}
@@ -720,51 +481,24 @@ class Lock2 implements Tile {
   isAir() {
     return false;
   }
-  isFlux() {
-    return false;
-  }
-  isUnbreakable() {
-    return false;
-  }
-  isPlayer() {
-    return false;
-  }
-  isStone() {
-    return false;
-  }
   isFallingStone() {
-    return false;
-  }
-  isBox() {
     return false;
   }
   isFallingBox() {
     return false;
   }
-  isKey1() {
-    return false;
-  }
   isLock1() {
-    return false;
-  }
-  isKey2() {
     return false;
   }
   isLock2() {
     return true;
   }
 
-  isEdible() {
-    return this.isFlux() || this.isAir();
-  }
-  isPushable() {
-    return this.isStone() || this.isBox();
-  }
   isFalling(): boolean {
-    return this.isFallingStone() || this.isFallingBox();
+    return false;
   }
   canFall() {
-    return this.isStone() || this.isBox();
+    return false;
   }
 
   rest(): void {}
