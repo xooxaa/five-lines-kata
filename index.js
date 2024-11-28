@@ -407,18 +407,6 @@ var Lock2 = /** @class */ (function () {
 var Right = /** @class */ (function () {
     function Right() {
     }
-    Right.prototype.isRight = function () {
-        return true;
-    };
-    Right.prototype.isLeft = function () {
-        return false;
-    };
-    Right.prototype.isUp = function () {
-        return false;
-    };
-    Right.prototype.isDown = function () {
-        return false;
-    };
     Right.prototype.handle = function () {
         map[playery][playerx + 1].moveHorizontal(1);
     };
@@ -427,18 +415,6 @@ var Right = /** @class */ (function () {
 var Left = /** @class */ (function () {
     function Left() {
     }
-    Left.prototype.isRight = function () {
-        return false;
-    };
-    Left.prototype.isLeft = function () {
-        return true;
-    };
-    Left.prototype.isUp = function () {
-        return false;
-    };
-    Left.prototype.isDown = function () {
-        return false;
-    };
     Left.prototype.handle = function () {
         map[playery][playerx - 1].moveHorizontal(-1);
     };
@@ -447,18 +423,6 @@ var Left = /** @class */ (function () {
 var Up = /** @class */ (function () {
     function Up() {
     }
-    Up.prototype.isRight = function () {
-        return false;
-    };
-    Up.prototype.isLeft = function () {
-        return false;
-    };
-    Up.prototype.isUp = function () {
-        return true;
-    };
-    Up.prototype.isDown = function () {
-        return false;
-    };
     Up.prototype.handle = function () {
         map[playery - 1][playerx].moveVertical(-1);
     };
@@ -467,18 +431,6 @@ var Up = /** @class */ (function () {
 var Down = /** @class */ (function () {
     function Down() {
     }
-    Down.prototype.isRight = function () {
-        return false;
-    };
-    Down.prototype.isLeft = function () {
-        return false;
-    };
-    Down.prototype.isUp = function () {
-        return false;
-    };
-    Down.prototype.isDown = function () {
-        return true;
-    };
     Down.prototype.handle = function () {
         map[playery + 1][playerx].moveVertical(1);
     };
