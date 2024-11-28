@@ -87,6 +87,9 @@ var Air = /** @class */ (function () {
     Air.prototype.isFalling = function () {
         return this.isFallingStone() || this.isFallingBox();
     };
+    Air.prototype.canFall = function () {
+        return this.isStone() || this.isBox();
+    };
     Air.prototype.rest = function () { };
     Air.prototype.drop = function () { };
     Air.prototype.color = function (g) { };
@@ -97,6 +100,7 @@ var Air = /** @class */ (function () {
     Air.prototype.moveVertical = function (dy) {
         moveToTile(playerx, playery + dy);
     };
+    Air.prototype.update = function (x, y) { };
     return Air;
 }());
 var Flux = /** @class */ (function () {
@@ -147,6 +151,9 @@ var Flux = /** @class */ (function () {
     Flux.prototype.isFalling = function () {
         return this.isFallingStone() || this.isFallingBox();
     };
+    Flux.prototype.canFall = function () {
+        return this.isStone() || this.isBox();
+    };
     Flux.prototype.rest = function () { };
     Flux.prototype.drop = function () { };
     Flux.prototype.color = function (g) {
@@ -161,6 +168,7 @@ var Flux = /** @class */ (function () {
     Flux.prototype.moveVertical = function (dy) {
         moveToTile(playerx, playery + dy);
     };
+    Flux.prototype.update = function (x, y) { };
     return Flux;
 }());
 var Unbreakable = /** @class */ (function () {
@@ -211,6 +219,9 @@ var Unbreakable = /** @class */ (function () {
     Unbreakable.prototype.isFalling = function () {
         return this.isFallingStone() || this.isFallingBox();
     };
+    Unbreakable.prototype.canFall = function () {
+        return this.isStone() || this.isBox();
+    };
     Unbreakable.prototype.rest = function () { };
     Unbreakable.prototype.drop = function () { };
     Unbreakable.prototype.color = function (g) {
@@ -221,6 +232,7 @@ var Unbreakable = /** @class */ (function () {
     };
     Unbreakable.prototype.moveHorizontal = function (dx) { };
     Unbreakable.prototype.moveVertical = function (dy) { };
+    Unbreakable.prototype.update = function (x, y) { };
     return Unbreakable;
 }());
 var Player = /** @class */ (function () {
@@ -271,6 +283,9 @@ var Player = /** @class */ (function () {
     Player.prototype.isFalling = function () {
         return this.isFallingStone() || this.isFallingBox();
     };
+    Player.prototype.canFall = function () {
+        return this.isStone() || this.isBox();
+    };
     Player.prototype.rest = function () { };
     Player.prototype.drop = function () { };
     Player.prototype.color = function (g) {
@@ -281,6 +296,7 @@ var Player = /** @class */ (function () {
     };
     Player.prototype.moveHorizontal = function (dx) { };
     Player.prototype.moveVertical = function (dy) { };
+    Player.prototype.update = function (x, y) { };
     return Player;
 }());
 var Stone = /** @class */ (function () {
@@ -332,6 +348,9 @@ var Stone = /** @class */ (function () {
     Stone.prototype.isFalling = function () {
         return this.isFallingStone() || this.isFallingBox();
     };
+    Stone.prototype.canFall = function () {
+        return this.isStone() || this.isBox();
+    };
     Stone.prototype.rest = function () {
         this.falling = new Resting();
     };
@@ -348,6 +367,16 @@ var Stone = /** @class */ (function () {
         this.falling.moveHorizontal(this, dx);
     };
     Stone.prototype.moveVertical = function (dy) { };
+    Stone.prototype.update = function (x, y) {
+        if (map[y + 1][x].isAir()) {
+            this.falling = new Falling();
+            map[y + 1][x] = this;
+            map[y][x] = new Air();
+        }
+        else if (this.falling.isFalling()) {
+            this.falling = new Resting();
+        }
+    };
     return Stone;
 }());
 var Box = /** @class */ (function () {
@@ -399,6 +428,9 @@ var Box = /** @class */ (function () {
     Box.prototype.isFalling = function () {
         return this.isFallingStone() || this.isFallingBox();
     };
+    Box.prototype.canFall = function () {
+        return this.isStone() || this.isBox();
+    };
     Box.prototype.rest = function () {
         this.falling = new Resting();
     };
@@ -415,6 +447,16 @@ var Box = /** @class */ (function () {
         this.falling.moveHorizontal(this, dx);
     };
     Box.prototype.moveVertical = function (dy) { };
+    Box.prototype.update = function (x, y) {
+        if (map[y + 1][x].isAir()) {
+            this.falling = new Falling();
+            map[y + 1][x] = this;
+            map[y][x] = new Air();
+        }
+        else if (this.falling.isFalling()) {
+            this.falling = new Resting();
+        }
+    };
     return Box;
 }());
 var Key1 = /** @class */ (function () {
@@ -465,6 +507,9 @@ var Key1 = /** @class */ (function () {
     Key1.prototype.isFalling = function () {
         return this.isFallingStone() || this.isFallingBox();
     };
+    Key1.prototype.canFall = function () {
+        return this.isStone() || this.isBox();
+    };
     Key1.prototype.rest = function () { };
     Key1.prototype.drop = function () { };
     Key1.prototype.color = function (g) {
@@ -481,6 +526,7 @@ var Key1 = /** @class */ (function () {
         removeLock1();
         moveToTile(playerx, playery + dy);
     };
+    Key1.prototype.update = function (x, y) { };
     return Key1;
 }());
 var Lock1 = /** @class */ (function () {
@@ -531,6 +577,9 @@ var Lock1 = /** @class */ (function () {
     Lock1.prototype.isFalling = function () {
         return this.isFallingStone() || this.isFallingBox();
     };
+    Lock1.prototype.canFall = function () {
+        return this.isStone() || this.isBox();
+    };
     Lock1.prototype.rest = function () { };
     Lock1.prototype.drop = function () { };
     Lock1.prototype.color = function (g) {
@@ -541,6 +590,7 @@ var Lock1 = /** @class */ (function () {
     };
     Lock1.prototype.moveHorizontal = function (dx) { };
     Lock1.prototype.moveVertical = function (dy) { };
+    Lock1.prototype.update = function (x, y) { };
     return Lock1;
 }());
 var Key2 = /** @class */ (function () {
@@ -591,6 +641,9 @@ var Key2 = /** @class */ (function () {
     Key2.prototype.isFalling = function () {
         return this.isFallingStone() || this.isFallingBox();
     };
+    Key2.prototype.canFall = function () {
+        return this.isStone() || this.isBox();
+    };
     Key2.prototype.rest = function () { };
     Key2.prototype.drop = function () { };
     Key2.prototype.color = function (g) {
@@ -607,6 +660,7 @@ var Key2 = /** @class */ (function () {
         removeLock2();
         moveToTile(playerx, playery + dy);
     };
+    Key2.prototype.update = function (x, y) { };
     return Key2;
 }());
 var Lock2 = /** @class */ (function () {
@@ -657,6 +711,9 @@ var Lock2 = /** @class */ (function () {
     Lock2.prototype.isFalling = function () {
         return this.isFallingStone() || this.isFallingBox();
     };
+    Lock2.prototype.canFall = function () {
+        return this.isStone() || this.isBox();
+    };
     Lock2.prototype.rest = function () { };
     Lock2.prototype.drop = function () { };
     Lock2.prototype.color = function (g) {
@@ -667,6 +724,7 @@ var Lock2 = /** @class */ (function () {
     };
     Lock2.prototype.moveHorizontal = function (dx) { };
     Lock2.prototype.moveVertical = function (dy) { };
+    Lock2.prototype.update = function (x, y) { };
     return Lock2;
 }());
 var Right = /** @class */ (function () {
@@ -845,17 +903,7 @@ function updateMap() {
     }
 }
 function updateTile(x, y) {
-    if (map[y][x].isStone() && map[y + 1][x].isAir()) {
-        map[y + 1][x] = new Stone(new Falling());
-        map[y][x] = new Air();
-    }
-    else if (map[y][x].isBox() && map[y + 1][x].isAir()) {
-        map[y + 1][x] = new Box(new Falling());
-        map[y][x] = new Air();
-    }
-    else if (map[y][x].isFalling()) {
-        map[y][x].rest();
-    }
+    map[y][x].update(x, y);
 }
 function draw() {
     var graphics = createGraphics();
