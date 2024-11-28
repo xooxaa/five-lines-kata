@@ -22,9 +22,6 @@ var Falling = /** @class */ (function () {
     Falling.prototype.isFalling = function () {
         return true;
     };
-    Falling.prototype.isResting = function () {
-        return false;
-    };
     return Falling;
 }());
 var Resting = /** @class */ (function () {
@@ -32,9 +29,6 @@ var Resting = /** @class */ (function () {
     }
     Resting.prototype.isFalling = function () {
         return false;
-    };
-    Resting.prototype.isResting = function () {
-        return true;
     };
     return Resting;
 }());
