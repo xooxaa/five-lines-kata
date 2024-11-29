@@ -1,3 +1,6 @@
+var TILE_SIZE = 40;
+var FPS = 30;
+var SLEEP = 1000 / FPS;
 var rawMap = [
     [2, 2, 2, 2, 2, 2, 2, 2],
     [2, 3, 0, 1, 1, 1, 0, 2],
@@ -5,6 +8,137 @@ var rawMap = [
     [2, 8, 4, 1, 1, 11, 0, 2],
     [2, 4, 1, 1, 1, 9, 10, 2],
     [2, 2, 2, 2, 2, 2, 2, 2],
+];
+var AirValue = /** @class */ (function () {
+    function AirValue() {
+    }
+    AirValue.prototype.transform = function () {
+        return new Air();
+    };
+    return AirValue;
+}());
+var FluxValue = /** @class */ (function () {
+    function FluxValue() {
+    }
+    FluxValue.prototype.transform = function () {
+        return new Flux();
+    };
+    return FluxValue;
+}());
+var UnbreakableValue = /** @class */ (function () {
+    function UnbreakableValue() {
+    }
+    UnbreakableValue.prototype.transform = function () {
+        return new Unbreakable();
+    };
+    return UnbreakableValue;
+}());
+var PlayerValue = /** @class */ (function () {
+    function PlayerValue() {
+    }
+    PlayerValue.prototype.transform = function () {
+        return new PlayerTile();
+    };
+    return PlayerValue;
+}());
+var StoneValue = /** @class */ (function () {
+    function StoneValue() {
+    }
+    StoneValue.prototype.transform = function () {
+        return new Stone(new Resting());
+    };
+    return StoneValue;
+}());
+var FallingStoneValue = /** @class */ (function () {
+    function FallingStoneValue() {
+    }
+    FallingStoneValue.prototype.transform = function () {
+        return new Stone(new Falling());
+    };
+    return FallingStoneValue;
+}());
+var BoxValue = /** @class */ (function () {
+    function BoxValue() {
+    }
+    BoxValue.prototype.transform = function () {
+        return new Box(new Resting());
+    };
+    return BoxValue;
+}());
+var FallingBoxValue = /** @class */ (function () {
+    function FallingBoxValue() {
+    }
+    FallingBoxValue.prototype.transform = function () {
+        return new Box(new Falling());
+    };
+    return FallingBoxValue;
+}());
+var Key1Value = /** @class */ (function () {
+    function Key1Value() {
+    }
+    Key1Value.prototype.transform = function () {
+        return new Key(YELLOW_KEY);
+    };
+    return Key1Value;
+}());
+var Lock1Value = /** @class */ (function () {
+    function Lock1Value() {
+    }
+    Lock1Value.prototype.transform = function () {
+        return new Locked(YELLOW_KEY);
+    };
+    return Lock1Value;
+}());
+var Key2Value = /** @class */ (function () {
+    function Key2Value() {
+    }
+    Key2Value.prototype.transform = function () {
+        return new Key(TEAL_KEY);
+    };
+    return Key2Value;
+}());
+var Lock2Value = /** @class */ (function () {
+    function Lock2Value() {
+    }
+    Lock2Value.prototype.transform = function () {
+        return new Locked(TEAL_KEY);
+    };
+    return Lock2Value;
+}());
+var RawTile = /** @class */ (function () {
+    function RawTile(value) {
+        this.value = value;
+    }
+    RawTile.prototype.transform = function () {
+        return this.value.transform();
+    };
+    RawTile.AIR = new RawTile(new AirValue());
+    RawTile.FLUX = new RawTile(new FluxValue());
+    RawTile.UNBREAKABLE = new RawTile(new UnbreakableValue());
+    RawTile.PLAYER = new RawTile(new PlayerValue());
+    RawTile.STONE = new RawTile(new StoneValue());
+    RawTile.FALLING_STONE = new RawTile(new FallingStoneValue());
+    RawTile.BOX = new RawTile(new BoxValue());
+    RawTile.FALLING_BOX = new RawTile(new FallingBoxValue());
+    RawTile.KEY1 = new RawTile(new Key1Value());
+    RawTile.LOCK1 = new RawTile(new Lock1Value());
+    RawTile.KEY2 = new RawTile(new Key2Value());
+    RawTile.LOCK2 = new RawTile(new Lock2Value());
+    return RawTile;
+}());
+var RAW_TILES = [
+    RawTile.AIR,
+    RawTile.FLUX,
+    RawTile.UNBREAKABLE,
+    RawTile.PLAYER,
+    RawTile.STONE,
+    RawTile.FALLING_STONE,
+    RawTile.BOX,
+    RawTile.FALLING_BOX,
+    RawTile.KEY1,
+    RawTile.LOCK1,
+    RawTile.KEY2,
+    RawTile.LOCK2,
 ];
 var Falling = /** @class */ (function () {
     function Falling() {
@@ -103,7 +237,7 @@ var Air = /** @class */ (function () {
     Air.prototype.moveVertical = function (map, player, dy) {
         player.move(0, dy);
     };
-    Air.prototype.update = function (map, x, y) { };
+    Air.prototype.update = function (x, y) { };
     Air.prototype.draw = function (g, x, y) { };
     return Air;
 }());
@@ -134,7 +268,7 @@ var Flux = /** @class */ (function () {
     Flux.prototype.moveVertical = function (map, player, dy) {
         player.move(0, dy);
     };
-    Flux.prototype.update = function (map, x, y) { };
+    Flux.prototype.update = function (x, y) { };
     Flux.prototype.draw = function (g, x, y) {
         g.fillStyle = "#ccffcc";
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
@@ -164,7 +298,7 @@ var Unbreakable = /** @class */ (function () {
     };
     Unbreakable.prototype.moveHorizontal = function (map, player, dx) { };
     Unbreakable.prototype.moveVertical = function (map, player, dy) { };
-    Unbreakable.prototype.update = function (map, x, y) { };
+    Unbreakable.prototype.update = function (x, y) { };
     Unbreakable.prototype.draw = function (g, x, y) {
         g.fillStyle = "#999999";
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
@@ -194,7 +328,7 @@ var PlayerTile = /** @class */ (function () {
     };
     PlayerTile.prototype.moveHorizontal = function (map, player, dx) { };
     PlayerTile.prototype.moveVertical = function (map, player, dy) { };
-    PlayerTile.prototype.update = function (map, x, y) { };
+    PlayerTile.prototype.update = function (x, y) { };
     PlayerTile.prototype.draw = function (g, x, y) {
         g.fillStyle = "#ff0000";
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
@@ -228,7 +362,7 @@ var Stone = /** @class */ (function () {
         this.fallingStrategy.moveHorizontal(map, player, this, dx);
     };
     Stone.prototype.moveVertical = function (map, player, dy) { };
-    Stone.prototype.update = function (map, x, y) {
+    Stone.prototype.update = function (x, y) {
         this.fallingStrategy.update(this, x, y);
     };
     Stone.prototype.draw = function (g, x, y) {
@@ -264,7 +398,7 @@ var Box = /** @class */ (function () {
         this.fallingStrategy.moveHorizontal(map, player, this, dx);
     };
     Box.prototype.moveVertical = function (map, player, dy) { };
-    Box.prototype.update = function (map, x, y) {
+    Box.prototype.update = function (x, y) {
         this.fallingStrategy.update(this, x, y);
     };
     Box.prototype.draw = function (g, x, y) {
@@ -303,7 +437,7 @@ var Key = /** @class */ (function () {
         this.keyConf.removeLock();
         player.move(0, dy);
     };
-    Key.prototype.update = function (map, x, y) { };
+    Key.prototype.update = function (x, y) { };
     Key.prototype.draw = function (g, x, y) {
         this.keyConf.setColor(g);
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
@@ -334,7 +468,7 @@ var Locked = /** @class */ (function () {
     };
     Locked.prototype.moveHorizontal = function (map, player, dx) { };
     Locked.prototype.moveVertical = function (map, player, dy) { };
-    Locked.prototype.update = function (map, x, y) { };
+    Locked.prototype.update = function (x, y) { };
     Locked.prototype.draw = function (g, x, y) {
         this.keyConf.setColor(g);
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
@@ -438,14 +572,14 @@ var Map = /** @class */ (function () {
         for (var y = 0; y < rawMap.length; y++) {
             this.map[y] = new Array(rawMap[y].length);
             for (var x = 0; x < rawMap[y].length; x++) {
-                this.map[y][x] = transformTile(rawMap[y][x]);
+                this.map[y][x] = transformTile(RAW_TILES[rawMap[y][x]]);
             }
         }
     };
     Map.prototype.update = function () {
         for (var y = this.map.length - 1; y >= 0; y--) {
             for (var x = 0; x < this.map[y].length; x++) {
-                this.map[y][x].update(map, x, y);
+                this.map[y][x].update(x, y);
             }
         }
     };
@@ -479,24 +613,6 @@ var Map = /** @class */ (function () {
     };
     return Map;
 }());
-var RawTile;
-(function (RawTile) {
-    RawTile[RawTile["AIR"] = 0] = "AIR";
-    RawTile[RawTile["FLUX"] = 1] = "FLUX";
-    RawTile[RawTile["UNBREAKABLE"] = 2] = "UNBREAKABLE";
-    RawTile[RawTile["PLAYER"] = 3] = "PLAYER";
-    RawTile[RawTile["STONE"] = 4] = "STONE";
-    RawTile[RawTile["FALLING_STONE"] = 5] = "FALLING_STONE";
-    RawTile[RawTile["BOX"] = 6] = "BOX";
-    RawTile[RawTile["FALLING_BOX"] = 7] = "FALLING_BOX";
-    RawTile[RawTile["KEY1"] = 8] = "KEY1";
-    RawTile[RawTile["LOCK1"] = 9] = "LOCK1";
-    RawTile[RawTile["KEY2"] = 10] = "KEY2";
-    RawTile[RawTile["LOCK2"] = 11] = "LOCK2";
-})(RawTile || (RawTile = {}));
-var TILE_SIZE = 40;
-var FPS = 30;
-var SLEEP = 1000 / FPS;
 var YELLOW_KEY = new KeyConfiguration("#ffcc00", true, new RemoveLock1());
 var TEAL_KEY = new KeyConfiguration("#00ccff", false, new RemoveLock2());
 var player = new Player();
@@ -506,34 +622,7 @@ function assertExhausted(x) {
     throw new Error("Unexpected Object" + x);
 }
 function transformTile(tile) {
-    switch (tile) {
-        case RawTile.AIR:
-            return new Air();
-        case RawTile.FLUX:
-            return new Flux();
-        case RawTile.UNBREAKABLE:
-            return new Unbreakable();
-        case RawTile.PLAYER:
-            return new PlayerTile();
-        case RawTile.STONE:
-            return new Stone(new Resting());
-        case RawTile.FALLING_STONE:
-            return new Stone(new Falling());
-        case RawTile.BOX:
-            return new Box(new Resting());
-        case RawTile.FALLING_BOX:
-            return new Box(new Falling());
-        case RawTile.KEY1:
-            return new Key(YELLOW_KEY);
-        case RawTile.LOCK1:
-            return new Locked(YELLOW_KEY);
-        case RawTile.KEY2:
-            return new Key(TEAL_KEY);
-        case RawTile.LOCK2:
-            return new Locked(TEAL_KEY);
-        default:
-            assertExhausted(tile);
-    }
+    return tile.transform();
 }
 function update() {
     handleInputs();
