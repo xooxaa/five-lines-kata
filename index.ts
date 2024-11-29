@@ -565,7 +565,7 @@ class Map {
     for (let y = 0; y < rawMap.length; y++) {
       this.map[y] = new Array(rawMap[y].length);
       for (let x = 0; x < rawMap[y].length; x++) {
-        this.map[y][x] = transformTile(RAW_TILES[rawMap[y][x]]);
+        this.map[y][x] = RAW_TILES[rawMap[y][x]].transform();
       }
     }
   }
@@ -619,17 +619,9 @@ const player = new Player();
 const map = new Map();
 const inputs: Input[] = [];
 
-function assertExhausted(x: never): never {
-  throw new Error("Unexpected Object" + x);
-}
-
-function transformTile(tile: RawTile) {
-  return tile.transform();
-}
-
-function update() {
-  handleInputs();
-  map.update();
+function resetMap() {
+  map.transform();
+  player.reset();
 }
 
 function handleInputs() {
@@ -639,16 +631,21 @@ function handleInputs() {
   }
 }
 
-function draw() {
-  const graphics = createGraphics();
-  map.draw(graphics);
-}
-
 function createGraphics() {
   let canvas = document.getElementById("GameCanvas") as HTMLCanvasElement;
   let graphics = canvas.getContext("2d");
   graphics.clearRect(0, 0, canvas.width, canvas.height);
   return graphics;
+}
+
+function update() {
+  handleInputs();
+  map.update();
+}
+
+function draw() {
+  const graphics = createGraphics();
+  map.draw(graphics);
 }
 
 function gameLoop() {
@@ -660,11 +657,6 @@ function gameLoop() {
   let frameTime = after - before;
   let sleep = SLEEP - frameTime;
   setTimeout(() => gameLoop(), sleep);
-}
-
-function resetMap() {
-  map.transform();
-  player.reset();
 }
 
 window.onload = () => {

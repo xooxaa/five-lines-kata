@@ -572,7 +572,7 @@ var Map = /** @class */ (function () {
         for (var y = 0; y < rawMap.length; y++) {
             this.map[y] = new Array(rawMap[y].length);
             for (var x = 0; x < rawMap[y].length; x++) {
-                this.map[y][x] = transformTile(RAW_TILES[rawMap[y][x]]);
+                this.map[y][x] = RAW_TILES[rawMap[y][x]].transform();
             }
         }
     };
@@ -618,15 +618,9 @@ var TEAL_KEY = new KeyConfiguration("#00ccff", false, new RemoveLock2());
 var player = new Player();
 var map = new Map();
 var inputs = [];
-function assertExhausted(x) {
-    throw new Error("Unexpected Object" + x);
-}
-function transformTile(tile) {
-    return tile.transform();
-}
-function update() {
-    handleInputs();
-    map.update();
+function resetMap() {
+    map.transform();
+    player.reset();
 }
 function handleInputs() {
     while (inputs.length > 0) {
@@ -634,15 +628,19 @@ function handleInputs() {
         input.handle(map, player);
     }
 }
-function draw() {
-    var graphics = createGraphics();
-    map.draw(graphics);
-}
 function createGraphics() {
     var canvas = document.getElementById("GameCanvas");
     var graphics = canvas.getContext("2d");
     graphics.clearRect(0, 0, canvas.width, canvas.height);
     return graphics;
+}
+function update() {
+    handleInputs();
+    map.update();
+}
+function draw() {
+    var graphics = createGraphics();
+    map.draw(graphics);
 }
 function gameLoop() {
     var before = Date.now();
@@ -653,10 +651,6 @@ function gameLoop() {
     var frameTime = after - before;
     var sleep = SLEEP - frameTime;
     setTimeout(function () { return gameLoop(); }, sleep);
-}
-function resetMap() {
-    map.transform();
-    player.reset();
 }
 window.onload = function () {
     gameLoop();
