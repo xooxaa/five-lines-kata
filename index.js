@@ -1,145 +1,29 @@
-var TILE_SIZE = 40;
-var FPS = 30;
-var SLEEP = 1000 / FPS;
-var rawMap = [
-    [2, 2, 2, 2, 2, 2, 2, 2],
-    [2, 3, 0, 1, 1, 1, 0, 2],
-    [2, 4, 2, 6, 2, 2, 0, 2],
-    [2, 8, 4, 1, 1, 11, 0, 2],
-    [2, 4, 1, 1, 1, 9, 10, 2],
-    [2, 2, 2, 2, 2, 2, 2, 2],
-];
-var AirValue = /** @class */ (function () {
-    function AirValue() {
+var RawTileFactory = /** @class */ (function () {
+    function RawTileFactory() {
     }
-    AirValue.prototype.transform = function () {
-        return new Air();
+    RawTileFactory.createTile = function (rawValue) {
+        var tileFactory = this.TILE_MAPPING[rawValue];
+        if (!tileFactory) {
+            throw new Error("No Tile mapped for raw value: ".concat(rawValue));
+        }
+        return tileFactory();
     };
-    return AirValue;
-}());
-var FluxValue = /** @class */ (function () {
-    function FluxValue() {
-    }
-    FluxValue.prototype.transform = function () {
-        return new Flux();
+    RawTileFactory.TILE_MAPPING = {
+        0: function () { return new Air(); },
+        1: function () { return new Flux(); },
+        2: function () { return new Unbreakable(); },
+        3: function () { return new PlayerTile(); },
+        4: function () { return new Stone(new Resting()); },
+        5: function () { return new Stone(new Falling()); },
+        6: function () { return new Box(new Resting()); },
+        7: function () { return new Box(new Falling()); },
+        8: function () { return new Key(YELLOW_KEY); },
+        9: function () { return new Locked(YELLOW_KEY); },
+        10: function () { return new Key(TEAL_KEY); },
+        11: function () { return new Locked(TEAL_KEY); },
     };
-    return FluxValue;
+    return RawTileFactory;
 }());
-var UnbreakableValue = /** @class */ (function () {
-    function UnbreakableValue() {
-    }
-    UnbreakableValue.prototype.transform = function () {
-        return new Unbreakable();
-    };
-    return UnbreakableValue;
-}());
-var PlayerValue = /** @class */ (function () {
-    function PlayerValue() {
-    }
-    PlayerValue.prototype.transform = function () {
-        return new PlayerTile();
-    };
-    return PlayerValue;
-}());
-var StoneValue = /** @class */ (function () {
-    function StoneValue() {
-    }
-    StoneValue.prototype.transform = function () {
-        return new Stone(new Resting());
-    };
-    return StoneValue;
-}());
-var FallingStoneValue = /** @class */ (function () {
-    function FallingStoneValue() {
-    }
-    FallingStoneValue.prototype.transform = function () {
-        return new Stone(new Falling());
-    };
-    return FallingStoneValue;
-}());
-var BoxValue = /** @class */ (function () {
-    function BoxValue() {
-    }
-    BoxValue.prototype.transform = function () {
-        return new Box(new Resting());
-    };
-    return BoxValue;
-}());
-var FallingBoxValue = /** @class */ (function () {
-    function FallingBoxValue() {
-    }
-    FallingBoxValue.prototype.transform = function () {
-        return new Box(new Falling());
-    };
-    return FallingBoxValue;
-}());
-var Key1Value = /** @class */ (function () {
-    function Key1Value() {
-    }
-    Key1Value.prototype.transform = function () {
-        return new Key(YELLOW_KEY);
-    };
-    return Key1Value;
-}());
-var Lock1Value = /** @class */ (function () {
-    function Lock1Value() {
-    }
-    Lock1Value.prototype.transform = function () {
-        return new Locked(YELLOW_KEY);
-    };
-    return Lock1Value;
-}());
-var Key2Value = /** @class */ (function () {
-    function Key2Value() {
-    }
-    Key2Value.prototype.transform = function () {
-        return new Key(TEAL_KEY);
-    };
-    return Key2Value;
-}());
-var Lock2Value = /** @class */ (function () {
-    function Lock2Value() {
-    }
-    Lock2Value.prototype.transform = function () {
-        return new Locked(TEAL_KEY);
-    };
-    return Lock2Value;
-}());
-var RawTile = /** @class */ (function () {
-    function RawTile(value) {
-        this.value = value;
-    }
-    RawTile.prototype.transform = function () {
-        return this.value.transform();
-    };
-    RawTile.AIR = new RawTile(new AirValue());
-    RawTile.FLUX = new RawTile(new FluxValue());
-    RawTile.UNBREAKABLE = new RawTile(new UnbreakableValue());
-    RawTile.PLAYER = new RawTile(new PlayerValue());
-    RawTile.STONE = new RawTile(new StoneValue());
-    RawTile.FALLING_STONE = new RawTile(new FallingStoneValue());
-    RawTile.BOX = new RawTile(new BoxValue());
-    RawTile.FALLING_BOX = new RawTile(new FallingBoxValue());
-    RawTile.KEY1 = new RawTile(new Key1Value());
-    RawTile.LOCK1 = new RawTile(new Lock1Value());
-    RawTile.KEY2 = new RawTile(new Key2Value());
-    RawTile.LOCK2 = new RawTile(new Lock2Value());
-    return RawTile;
-}());
-var RAW_TILES = [
-    RawTile.AIR,
-    RawTile.FLUX,
-    RawTile.UNBREAKABLE,
-    RawTile.PLAYER,
-    RawTile.STONE,
-    RawTile.FALLING_STONE,
-    RawTile.BOX,
-    RawTile.FALLING_BOX,
-    RawTile.KEY1,
-    RawTile.LOCK1,
-    RawTile.KEY2,
-    RawTile.LOCK2,
-];
 var Falling = /** @class */ (function () {
     function Falling() {
     }
@@ -441,6 +325,11 @@ var Key = /** @class */ (function () {
     Key.prototype.draw = function (g, x, y) {
         this.keyConf.setColor(g);
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+        g.font = "".concat(TILE_SIZE / 3, "px Arial");
+        g.textAlign = "center";
+        g.textBaseline = "middle";
+        g.fillStyle = "black";
+        g.fillText("KEY", x * TILE_SIZE + TILE_SIZE / 2, y * TILE_SIZE + TILE_SIZE / 2);
     };
     return Key;
 }());
@@ -472,6 +361,11 @@ var Locked = /** @class */ (function () {
     Locked.prototype.draw = function (g, x, y) {
         this.keyConf.setColor(g);
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+        g.font = "".concat(TILE_SIZE / 4, "px Arial");
+        g.textAlign = "center";
+        g.textBaseline = "middle";
+        g.fillStyle = "black";
+        g.fillText("LOCK", x * TILE_SIZE + TILE_SIZE / 2, y * TILE_SIZE + TILE_SIZE / 2);
     };
     return Locked;
 }());
@@ -511,7 +405,7 @@ var Reset = /** @class */ (function () {
     function Reset() {
     }
     Reset.prototype.handle = function (map, player) {
-        resetMap();
+        map.reset(player);
     };
     return Reset;
 }());
@@ -544,9 +438,10 @@ var Player = /** @class */ (function () {
     return Player;
 }());
 var Map = /** @class */ (function () {
-    function Map() {
+    function Map(rawMap) {
+        this.rawMap = rawMap;
         this.map = [];
-        this.transform();
+        this.transform(this.rawMap);
     }
     Map.prototype.isAir = function (x, y) {
         return this.map[y][x].isAir();
@@ -567,14 +462,8 @@ var Map = /** @class */ (function () {
             player.moveToTile(this, x + dx, y);
         }
     };
-    Map.prototype.transform = function () {
-        this.map = new Array(rawMap.length);
-        for (var y = 0; y < rawMap.length; y++) {
-            this.map[y] = new Array(rawMap[y].length);
-            for (var x = 0; x < rawMap[y].length; x++) {
-                this.map[y][x] = RAW_TILES[rawMap[y][x]].transform();
-            }
-        }
+    Map.prototype.transform = function (rawMap) {
+        this.map = rawMap.map(function (row) { return row.map(function (value) { return RawTileFactory.createTile(value); }); });
     };
     Map.prototype.update = function () {
         for (var y = this.map.length - 1; y >= 0; y--) {
@@ -597,9 +486,13 @@ var Map = /** @class */ (function () {
     Map.prototype.getBlockOnTopState = function (x, y) {
         return this.map[y][x].getBlockOnTopState();
     };
-    Map.prototype.resetOnWin = function () {
+    Map.prototype.reset = function (player) {
+        this.transform(rawMap);
+        player.reset();
+    };
+    Map.prototype.resetOnWin = function (player) {
         if (this.map[4][6].isBox()) {
-            resetMap();
+            this.reset(player);
         }
     };
     Map.prototype.remove = function (removeStrategy) {
@@ -613,15 +506,22 @@ var Map = /** @class */ (function () {
     };
     return Map;
 }());
+var TILE_SIZE = 40;
+var FPS = 30;
+var SLEEP = 1000 / FPS;
 var YELLOW_KEY = new KeyConfiguration("#ffcc00", true, new RemoveLock1());
 var TEAL_KEY = new KeyConfiguration("#00ccff", false, new RemoveLock2());
+var rawMap = [
+    [2, 2, 2, 2, 2, 2, 2, 2],
+    [2, 3, 0, 1, 1, 1, 0, 2],
+    [2, 4, 2, 6, 2, 2, 0, 2],
+    [2, 8, 4, 1, 1, 11, 0, 2],
+    [2, 4, 1, 1, 1, 9, 10, 2],
+    [2, 2, 2, 2, 2, 2, 2, 2],
+];
 var player = new Player();
-var map = new Map();
+var map = new Map(rawMap);
 var inputs = [];
-function resetMap() {
-    map.transform();
-    player.reset();
-}
 function handleInputs() {
     while (inputs.length > 0) {
         var input = inputs.pop();
@@ -646,7 +546,7 @@ function gameLoop() {
     var before = Date.now();
     update();
     draw();
-    map.resetOnWin();
+    map.resetOnWin(player);
     var after = Date.now();
     var frameTime = after - before;
     var sleep = SLEEP - frameTime;
@@ -655,20 +555,15 @@ function gameLoop() {
 window.onload = function () {
     gameLoop();
 };
-var LEFT_KEY = "ArrowLeft";
-var UP_KEY = "ArrowUp";
-var RIGHT_KEY = "ArrowRight";
-var DOWN_KEY = "ArrowDown";
-var RESET_KEY = "r";
 window.addEventListener("keydown", function (e) {
-    if (e.key === LEFT_KEY || e.key === "a")
+    if (e.key === "ArrowLeft" || e.key === "a")
         inputs.push(new Left());
-    else if (e.key === UP_KEY || e.key === "w")
+    else if (e.key === "ArrowUp" || e.key === "w")
         inputs.push(new Up());
-    else if (e.key === RIGHT_KEY || e.key === "d")
+    else if (e.key === "ArrowRight" || e.key === "d")
         inputs.push(new Right());
-    else if (e.key === DOWN_KEY || e.key === "s")
+    else if (e.key === "ArrowDown" || e.key === "s")
         inputs.push(new Down());
-    else if (e.key === RESET_KEY)
+    else if (e.key === "r")
         inputs.push(new Reset());
 });
