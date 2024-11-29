@@ -1,3 +1,11 @@
+var rawMap = [
+    [2, 2, 2, 2, 2, 2, 2, 2],
+    [2, 3, 0, 1, 1, 1, 0, 2],
+    [2, 4, 2, 6, 2, 2, 0, 2],
+    [2, 8, 4, 1, 1, 11, 0, 2],
+    [2, 4, 1, 1, 1, 9, 10, 2],
+    [2, 2, 2, 2, 2, 2, 2, 2],
+];
 var Falling = /** @class */ (function () {
     function Falling() {
     }
@@ -5,10 +13,9 @@ var Falling = /** @class */ (function () {
         return true;
     };
     Falling.prototype.drop = function (tile, x, y) {
-        map[y + 1][x] = tile;
-        map[y][x] = new Air();
+        map.drop(tile, x, y);
     };
-    Falling.prototype.moveHorizontal = function (player, tile, dx) { };
+    Falling.prototype.moveHorizontal = function (map, player, tile, dx) { };
     return Falling;
 }());
 var Resting = /** @class */ (function () {
@@ -18,8 +25,8 @@ var Resting = /** @class */ (function () {
         return false;
     };
     Resting.prototype.drop = function (tile, x, y) { };
-    Resting.prototype.moveHorizontal = function (player, tile, dx) {
-        player.pushHorizontal(tile, dx);
+    Resting.prototype.moveHorizontal = function (map, player, tile, dx) {
+        player.pushHorizontal(map, tile, dx);
     };
     return Resting;
 }());
@@ -28,11 +35,11 @@ var FallingStrategy = /** @class */ (function () {
         this.falling = falling;
     }
     FallingStrategy.prototype.update = function (tile, x, y) {
-        this.falling = map[y + 1][x].getBlockOnTopState();
+        this.falling = map.getBlockOnTopState(x, y + 1);
         this.falling.drop(tile, x, y);
     };
-    FallingStrategy.prototype.moveHorizontal = function (player, tile, dx) {
-        this.falling.moveHorizontal(player, tile, dx);
+    FallingStrategy.prototype.moveHorizontal = function (map, player, tile, dx) {
+        this.falling.moveHorizontal(map, player, tile, dx);
     };
     return FallingStrategy;
 }());
@@ -49,7 +56,7 @@ var KeyConfiguration = /** @class */ (function () {
         return this._1;
     };
     KeyConfiguration.prototype.removeLock = function () {
-        remove(this.removeStrategy);
+        map.remove(this.removeStrategy);
     };
     return KeyConfiguration;
 }());
@@ -90,13 +97,13 @@ var Air = /** @class */ (function () {
     Air.prototype.getBlockOnTopState = function () {
         return new Falling();
     };
-    Air.prototype.moveHorizontal = function (player, dx) {
+    Air.prototype.moveHorizontal = function (map, player, dx) {
         player.move(dx, 0);
     };
-    Air.prototype.moveVertical = function (player, dy) {
+    Air.prototype.moveVertical = function (map, player, dy) {
         player.move(0, dy);
     };
-    Air.prototype.update = function (x, y) { };
+    Air.prototype.update = function (map, x, y) { };
     Air.prototype.draw = function (g, x, y) { };
     return Air;
 }());
@@ -121,17 +128,17 @@ var Flux = /** @class */ (function () {
     Flux.prototype.getBlockOnTopState = function () {
         return new Resting();
     };
+    Flux.prototype.moveHorizontal = function (map, player, dx) {
+        player.move(dx, 0);
+    };
+    Flux.prototype.moveVertical = function (map, player, dy) {
+        player.move(0, dy);
+    };
+    Flux.prototype.update = function (map, x, y) { };
     Flux.prototype.draw = function (g, x, y) {
         g.fillStyle = "#ccffcc";
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     };
-    Flux.prototype.moveHorizontal = function (player, dx) {
-        player.move(dx, 0);
-    };
-    Flux.prototype.moveVertical = function (player, dy) {
-        player.move(0, dy);
-    };
-    Flux.prototype.update = function (x, y) { };
     return Flux;
 }());
 var Unbreakable = /** @class */ (function () {
@@ -155,9 +162,9 @@ var Unbreakable = /** @class */ (function () {
     Unbreakable.prototype.getBlockOnTopState = function () {
         return new Resting();
     };
-    Unbreakable.prototype.moveHorizontal = function (player, dx) { };
-    Unbreakable.prototype.moveVertical = function (player, dy) { };
-    Unbreakable.prototype.update = function (x, y) { };
+    Unbreakable.prototype.moveHorizontal = function (map, player, dx) { };
+    Unbreakable.prototype.moveVertical = function (map, player, dy) { };
+    Unbreakable.prototype.update = function (map, x, y) { };
     Unbreakable.prototype.draw = function (g, x, y) {
         g.fillStyle = "#999999";
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
@@ -185,9 +192,9 @@ var PlayerTile = /** @class */ (function () {
     PlayerTile.prototype.getBlockOnTopState = function () {
         return new Resting();
     };
-    PlayerTile.prototype.moveHorizontal = function (player, dx) { };
-    PlayerTile.prototype.moveVertical = function (player, dy) { };
-    PlayerTile.prototype.update = function (x, y) { };
+    PlayerTile.prototype.moveHorizontal = function (map, player, dx) { };
+    PlayerTile.prototype.moveVertical = function (map, player, dy) { };
+    PlayerTile.prototype.update = function (map, x, y) { };
     PlayerTile.prototype.draw = function (g, x, y) {
         g.fillStyle = "#ff0000";
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
@@ -217,11 +224,11 @@ var Stone = /** @class */ (function () {
     Stone.prototype.getBlockOnTopState = function () {
         return new Resting();
     };
-    Stone.prototype.moveHorizontal = function (player, dx) {
-        this.fallingStrategy.moveHorizontal(player, this, dx);
+    Stone.prototype.moveHorizontal = function (map, player, dx) {
+        this.fallingStrategy.moveHorizontal(map, player, this, dx);
     };
-    Stone.prototype.moveVertical = function (player, dy) { };
-    Stone.prototype.update = function (x, y) {
+    Stone.prototype.moveVertical = function (map, player, dy) { };
+    Stone.prototype.update = function (map, x, y) {
         this.fallingStrategy.update(this, x, y);
     };
     Stone.prototype.draw = function (g, x, y) {
@@ -253,11 +260,11 @@ var Box = /** @class */ (function () {
     Box.prototype.getBlockOnTopState = function () {
         return new Resting();
     };
-    Box.prototype.moveHorizontal = function (player, dx) {
-        this.fallingStrategy.moveHorizontal(player, this, dx);
+    Box.prototype.moveHorizontal = function (map, player, dx) {
+        this.fallingStrategy.moveHorizontal(map, player, this, dx);
     };
-    Box.prototype.moveVertical = function (player, dy) { };
-    Box.prototype.update = function (x, y) {
+    Box.prototype.moveVertical = function (map, player, dy) { };
+    Box.prototype.update = function (map, x, y) {
         this.fallingStrategy.update(this, x, y);
     };
     Box.prototype.draw = function (g, x, y) {
@@ -288,15 +295,15 @@ var Key = /** @class */ (function () {
     Key.prototype.getBlockOnTopState = function () {
         return new Resting();
     };
-    Key.prototype.moveHorizontal = function (player, dx) {
+    Key.prototype.moveHorizontal = function (map, player, dx) {
         this.keyConf.removeLock();
         player.move(dx, 0);
     };
-    Key.prototype.moveVertical = function (player, dy) {
+    Key.prototype.moveVertical = function (map, player, dy) {
         this.keyConf.removeLock();
         player.move(0, dy);
     };
-    Key.prototype.update = function (x, y) { };
+    Key.prototype.update = function (map, x, y) { };
     Key.prototype.draw = function (g, x, y) {
         this.keyConf.setColor(g);
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
@@ -325,9 +332,9 @@ var Locked = /** @class */ (function () {
     Locked.prototype.getBlockOnTopState = function () {
         return new Resting();
     };
-    Locked.prototype.moveHorizontal = function (player, dx) { };
-    Locked.prototype.moveVertical = function (player, dy) { };
-    Locked.prototype.update = function (x, y) { };
+    Locked.prototype.moveHorizontal = function (map, player, dx) { };
+    Locked.prototype.moveVertical = function (map, player, dy) { };
+    Locked.prototype.update = function (map, x, y) { };
     Locked.prototype.draw = function (g, x, y) {
         this.keyConf.setColor(g);
         g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
@@ -337,39 +344,39 @@ var Locked = /** @class */ (function () {
 var Right = /** @class */ (function () {
     function Right() {
     }
-    Right.prototype.handle = function (player) {
-        player.moveHorizontal(1);
+    Right.prototype.handle = function (map, player) {
+        player.moveHorizontal(map, 1);
     };
     return Right;
 }());
 var Left = /** @class */ (function () {
     function Left() {
     }
-    Left.prototype.handle = function (player) {
-        player.moveHorizontal(-1);
+    Left.prototype.handle = function (map, player) {
+        player.moveHorizontal(map, -1);
     };
     return Left;
 }());
 var Up = /** @class */ (function () {
     function Up() {
     }
-    Up.prototype.handle = function (player) {
-        player.moveVertical(-1);
+    Up.prototype.handle = function (map, player) {
+        player.moveVertical(map, -1);
     };
     return Up;
 }());
 var Down = /** @class */ (function () {
     function Down() {
     }
-    Down.prototype.handle = function (player) {
-        player.moveVertical(1);
+    Down.prototype.handle = function (map, player) {
+        player.moveVertical(map, 1);
     };
     return Down;
 }());
 var Reset = /** @class */ (function () {
     function Reset() {
     }
-    Reset.prototype.handle = function (player) {
+    Reset.prototype.handle = function (map, player) {
         resetMap();
     };
     return Reset;
@@ -384,27 +391,93 @@ var Player = /** @class */ (function () {
         this.y = 1;
     };
     Player.prototype.move = function (dx, dy) {
-        this.moveToTile(this.x + dx, this.y + dy);
+        this.moveToTile(map, this.x + dx, this.y + dy);
     };
-    Player.prototype.moveHorizontal = function (dx) {
-        map[this.y][this.x + dx].moveHorizontal(this, dx);
+    Player.prototype.moveHorizontal = function (map, dx) {
+        map.moveHorizontal(this, this.x, this.y, dx);
     };
-    Player.prototype.moveVertical = function (dy) {
-        map[this.y + dy][this.x].moveVertical(this, dy);
+    Player.prototype.moveVertical = function (map, dy) {
+        map.moveVertical(this, this.x, this.y, dy);
     };
-    Player.prototype.pushHorizontal = function (tile, dx) {
-        if (map[this.y][this.x + dx + dx].isAir() && !map[this.y + 1][this.x + dx].isAir()) {
-            map[this.y][this.x + dx + dx] = tile;
-            this.moveToTile(this.x + dx, this.y);
-        }
+    Player.prototype.pushHorizontal = function (map, tile, dx) {
+        map.pushHorizontal(this, tile, this.x, this.y, dx);
     };
-    Player.prototype.moveToTile = function (newX, newY) {
-        map[this.y][this.x] = new Air();
-        map[newY][newX] = new PlayerTile();
+    Player.prototype.moveToTile = function (map, newX, newY) {
+        map.movePlayer(this.x, this.y, newX, newY);
         this.x = newX;
         this.y = newY;
     };
     return Player;
+}());
+var Map = /** @class */ (function () {
+    function Map() {
+        this.map = [];
+        this.transform();
+    }
+    Map.prototype.isAir = function (x, y) {
+        return this.map[y][x].isAir();
+    };
+    Map.prototype.movePlayer = function (x, y, newX, newY) {
+        this.map[y][x] = new Air();
+        this.map[newY][newX] = new PlayerTile();
+    };
+    Map.prototype.moveHorizontal = function (player, x, y, dx) {
+        this.map[y][x + dx].moveHorizontal(this, player, dx);
+    };
+    Map.prototype.moveVertical = function (player, x, y, dy) {
+        this.map[y + dy][x].moveVertical(this, player, dy);
+    };
+    Map.prototype.pushHorizontal = function (player, tile, x, y, dx) {
+        if (this.map[y][x + dx + dx].isAir() && !this.map[y][x + dx].isAir()) {
+            this.map[y][x + dx + dx] = tile;
+            player.moveToTile(this, x + dx, y);
+        }
+    };
+    Map.prototype.transform = function () {
+        this.map = new Array(rawMap.length);
+        for (var y = 0; y < rawMap.length; y++) {
+            this.map[y] = new Array(rawMap[y].length);
+            for (var x = 0; x < rawMap[y].length; x++) {
+                this.map[y][x] = transformTile(rawMap[y][x]);
+            }
+        }
+    };
+    Map.prototype.update = function () {
+        for (var y = this.map.length - 1; y >= 0; y--) {
+            for (var x = 0; x < this.map[y].length; x++) {
+                this.map[y][x].update(map, x, y);
+            }
+        }
+    };
+    Map.prototype.draw = function (g) {
+        for (var y = 0; y < this.map.length; y++) {
+            for (var x = 0; x < this.map[y].length; x++) {
+                this.map[y][x].draw(g, x, y);
+            }
+        }
+    };
+    Map.prototype.drop = function (tile, x, y) {
+        this.map[y + 1][x] = tile;
+        this.map[y][x] = new Air();
+    };
+    Map.prototype.getBlockOnTopState = function (x, y) {
+        return this.map[y][x].getBlockOnTopState();
+    };
+    Map.prototype.resetOnWin = function () {
+        if (this.map[4][6].isBox()) {
+            resetMap();
+        }
+    };
+    Map.prototype.remove = function (removeStrategy) {
+        for (var y = 0; y < this.map.length; y++) {
+            for (var x = 0; x < this.map[y].length; x++) {
+                if (removeStrategy.check(this.map[y][x])) {
+                    this.map[y][x] = new Air();
+                }
+            }
+        }
+    };
+    return Map;
 }());
 var RawTile;
 (function (RawTile) {
@@ -427,16 +500,8 @@ var SLEEP = 1000 / FPS;
 var YELLOW_KEY = new KeyConfiguration("#ffcc00", true, new RemoveLock1());
 var TEAL_KEY = new KeyConfiguration("#00ccff", false, new RemoveLock2());
 var player = new Player();
-var map = [];
+var map = new Map();
 var inputs = [];
-var rawMap = [
-    [2, 2, 2, 2, 2, 2, 2, 2],
-    [2, 3, 0, 1, 1, 1, 0, 2],
-    [2, 4, 2, 6, 2, 2, 0, 2],
-    [2, 8, 4, 1, 1, 11, 0, 2],
-    [2, 4, 1, 1, 1, 9, 10, 2],
-    [2, 2, 2, 2, 2, 2, 2, 2],
-];
 function assertExhausted(x) {
     throw new Error("Unexpected Object" + x);
 }
@@ -470,44 +535,19 @@ function transformTile(tile) {
             assertExhausted(tile);
     }
 }
-function transformMap() {
-    map = new Array(rawMap.length);
-    for (var y = 0; y < rawMap.length; y++) {
-        map[y] = new Array(rawMap[y].length);
-        for (var x = 0; x < rawMap[y].length; x++) {
-            map[y][x] = transformTile(rawMap[y][x]);
-        }
-    }
-}
-function remove(removeStrategy) {
-    for (var y = 0; y < map.length; y++) {
-        for (var x = 0; x < map[y].length; x++) {
-            if (removeStrategy.check(map[y][x])) {
-                map[y][x] = new Air();
-            }
-        }
-    }
-}
 function update() {
     handleInputs();
-    updateMap();
+    map.update();
 }
 function handleInputs() {
     while (inputs.length > 0) {
         var input = inputs.pop();
-        input.handle(player);
-    }
-}
-function updateMap() {
-    for (var y = map.length - 1; y >= 0; y--) {
-        for (var x = 0; x < map[y].length; x++) {
-            map[y][x].update(x, y);
-        }
+        input.handle(map, player);
     }
 }
 function draw() {
     var graphics = createGraphics();
-    drawMap(graphics);
+    map.draw(graphics);
 }
 function createGraphics() {
     var canvas = document.getElementById("GameCanvas");
@@ -515,34 +555,21 @@ function createGraphics() {
     graphics.clearRect(0, 0, canvas.width, canvas.height);
     return graphics;
 }
-function drawMap(g) {
-    for (var y = 0; y < map.length; y++) {
-        for (var x = 0; x < map[y].length; x++) {
-            map[y][x].draw(g, x, y);
-        }
-    }
-}
 function gameLoop() {
     var before = Date.now();
     update();
     draw();
-    resetOnWin();
+    map.resetOnWin();
     var after = Date.now();
     var frameTime = after - before;
     var sleep = SLEEP - frameTime;
     setTimeout(function () { return gameLoop(); }, sleep);
 }
-function resetOnWin() {
-    if (map[4][6].isBox()) {
-        resetMap();
-    }
-}
 function resetMap() {
-    transformMap();
+    map.transform();
     player.reset();
 }
 window.onload = function () {
-    transformMap();
     gameLoop();
 };
 var LEFT_KEY = "ArrowLeft";
