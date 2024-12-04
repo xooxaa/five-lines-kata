@@ -373,7 +373,7 @@ var Right = /** @class */ (function () {
     function Right() {
     }
     Right.prototype.handle = function (game) {
-        game.movePlayerHorizontal(1);
+        game.moveHorizontal(1);
     };
     return Right;
 }());
@@ -381,7 +381,7 @@ var Left = /** @class */ (function () {
     function Left() {
     }
     Left.prototype.handle = function (game) {
-        game.movePlayerHorizontal(-1);
+        game.moveHorizontal(-1);
     };
     return Left;
 }());
@@ -389,7 +389,7 @@ var Up = /** @class */ (function () {
     function Up() {
     }
     Up.prototype.handle = function (game) {
-        game.movePlayerVertical(-1);
+        game.moveVertical(-1);
     };
     return Up;
 }());
@@ -397,7 +397,7 @@ var Down = /** @class */ (function () {
     function Down() {
     }
     Down.prototype.handle = function (game) {
-        game.movePlayerVertical(1);
+        game.moveVertical(1);
     };
     return Down;
 }());
@@ -423,6 +423,12 @@ var Game = /** @class */ (function () {
     Game.prototype.isAir = function (x, y) {
         return this.map[y][x].isAir();
     };
+    Game.prototype.moveHorizontal = function (dx) {
+        this.map[this.playerY][this.playerX + dx].moveHorizontal(this, dx);
+    };
+    Game.prototype.moveVertical = function (dy) {
+        this.map[this.playerY + dy][this.playerX].moveVertical(this, dy);
+    };
     Game.prototype.movePlayer = function (dx, dy) {
         var newX = this.playerX + dx;
         var newY = this.playerY + dy;
@@ -430,12 +436,6 @@ var Game = /** @class */ (function () {
         this.map[newY][newX] = new PlayerTile();
         this.playerX = newX;
         this.playerY = newY;
-    };
-    Game.prototype.movePlayerHorizontal = function (dx) {
-        this.map[this.playerY][this.playerX + dx].moveHorizontal(this, dx);
-    };
-    Game.prototype.movePlayerVertical = function (dy) {
-        this.map[this.playerY + dy][this.playerX].moveVertical(this, dy);
     };
     Game.prototype.pushHorizontal = function (tile, dx) {
         if (this.map[this.playerY][this.playerX + dx + dx].isAir() && !this.map[this.playerY][this.playerX + dx].isAir()) {

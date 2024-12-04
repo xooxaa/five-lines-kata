@@ -399,25 +399,25 @@ interface Input {
 
 class Right implements Input {
   handle(game: Game): void {
-    game.movePlayerHorizontal(1);
+    game.moveHorizontal(1);
   }
 }
 
 class Left implements Input {
   handle(game: Game): void {
-    game.movePlayerHorizontal(-1);
+    game.moveHorizontal(-1);
   }
 }
 
 class Up implements Input {
   handle(game: Game): void {
-    game.movePlayerVertical(-1);
+    game.moveVertical(-1);
   }
 }
 
 class Down implements Input {
   handle(game: Game): void {
-    game.movePlayerVertical(1);
+    game.moveVertical(1);
   }
 }
 
@@ -444,6 +444,14 @@ class Game {
     return this.map[y][x].isAir();
   }
 
+  moveHorizontal(dx: number): void {
+    this.map[this.playerY][this.playerX + dx].moveHorizontal(this, dx);
+  }
+
+  moveVertical(dy: number): void {
+    this.map[this.playerY + dy][this.playerX].moveVertical(this, dy);
+  }
+
   movePlayer(dx: number, dy: number): void {
     const newX = this.playerX + dx;
     const newY = this.playerY + dy;
@@ -451,14 +459,6 @@ class Game {
     this.map[newY][newX] = new PlayerTile();
     this.playerX = newX;
     this.playerY = newY;
-  }
-
-  movePlayerHorizontal(dx: number): void {
-    this.map[this.playerY][this.playerX + dx].moveHorizontal(this, dx);
-  }
-
-  movePlayerVertical(dy: number): void {
-    this.map[this.playerY + dy][this.playerX].moveVertical(this, dy);
   }
 
   pushHorizontal(tile: Tile, dx: number): void {
